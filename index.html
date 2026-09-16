@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>link1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-primary: #4F46E5;
+  --color-secondary: #06B6D4;
+  --color-accent: #F59E0B;
+  --color-bg: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-correct: #22C55E;
+  --color-wrong: #EF4444;
+  --color-selecting: #2563EB;
+  --color-pending: #FEF3C7;
+  --color-pending-text: #92400E;
+}
+body {
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+  background-color: var(--color-bg);
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+.header {
+  background: var(--color-card);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+  text-align: center;
+}
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--color-primary);
+}
+.header-input {
+  margin-bottom: 10px;
+}
+.header-input input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 300px;
+}
+.progress-bar {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #E2E8F0;
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: var(--color-primary);
+  height: 100%;
+  width: 0%;
+  transition: width 0.3s;
+}
+.progress-text {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 15px 50px 15px;
+}
+.card {
+  background: var(--color-card);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-secondary);
+  margin-bottom: 15px;
+}
+.question-text {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 14px 20px;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.6;
+  border: 2px solid #E2E8F0;
+  border-radius: 12px;
+  background: var(--color-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow-wrap: break-word;
+  min-height: 52px;
+}
+.option-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--color-selecting);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.option-btn.pending {
+  background: var(--color-pending);
+  color: var(--color-pending-text);
+  border-color: var(--color-accent);
+  transform: scale(1.02);
+}
+.option-btn.correct {
+  background: var(--color-correct);
+  color: white;
+  border-color: var(--color-correct);
+}
+.option-btn.wrong {
+  background: var(--color-wrong);
+  color: white;
+  border-color: var(--color-wrong);
+  animation: shake 0.1s;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+.option-btn:disabled {
+  cursor: not-allowed;
+}
+.check-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  float: right;
+  font-family: inherit;
+}
+
+
+.explanation {
+  display: none;
+  margin-top: 60px;
+  padding: 15px;
+  background: #F1F5F9;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.8;
+  border-left: 4px solid var(--color-primary);
+}
+.footer {
+  text-align: center;
+  margin-top: 40px;
+}
+.submit-btn {
+  width: 100%;
+  max-width: 400px;
+  margin: 30px auto;
+  display: block;
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: 700;
+  background: var(--color-correct);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  font-family: inherit;
+}
+
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+.summary-table th, .summary-table td {
+  border: 1px solid #E2E8F0;
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+.summary-table td.correct-cell { background: var(--color-correct); color: white; }
+.summary-table td.wrong-cell { background: var(--color-wrong); color: white; }
+.summary-table td.empty-col { background: var(--color-wrong); color: white; }
+.summary-container {
+  display: none;
+  background: var(--color-card);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow-x: auto;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.popup {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 400px;
+}
+.popup h2 { color: var(--color-primary); margin-top: 0; }
+.popup p { font-size: 18px; line-height: 1.5; }
+.popup button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+@media (max-width: 600px) {
+  .header h1 { font-size: 20px; }
+  .progress-text { font-size: 15px; }
+  .question-text { font-size: 20px; }
+  .option-btn { font-size: 17px; }
+  .explanation { font-size: 16px; }
+  .check-btn, .submit-btn {
+  width: 100%;
+  max-width: 400px;
+  margin: 30px auto;
+  display: block;
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: 700;
+  background: var(--color-correct);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  font-family: inherit;
+}
+
+  .summary-table th, .summary-table td { font-size: 13px; padding: 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Unit 1 Grammar</h1>
+  <div class="header-input">
+    <input type="text" id="student-name" placeholder="Nhập tên của bạn để nộp bài...">
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <div class="progress-text" id="progress-text">Đã chọn: 0/48</div>
+</div>
+
+<div class="container" id="quiz-container">
+  <!-- Content will be injected here -->
+</div>
+
+<div class="footer">
+  <button class="submit-btn" id="submit-btn" onclick="submitQuiz()">Nộp bài</button>
+</div>
+
+<div class="container">
+  <div class="summary-container" id="summary-container">
+    <h2 style="text-align: center; color: var(--color-primary);" id="summary-title">Bảng Tổng Kết</h2>
+    <div id="summary-tables"></div>
+  </div>
+</div>
+
+<div class="popup-overlay" id="popup-overlay">
+  <div class="popup">
+    <h2>Kết quả</h2>
+    <p id="popup-score"></p>
+    <p id="popup-message"></p>
+    <button onclick="closePopup()">Xem chi tiết</button>
+  </div>
+</div>
+
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){}"></iframe>
+
+<script>
+// Web Audio API
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(frequency, duration, type, volume) {
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+    
+    gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+
+function playSelectSound() {
+  playTone(600, 0.08, 'sine', 0.15);
+}
+
+function playCorrectSound() {
+  playTone(800, 0.1, 'sine', 0.2);
+  setTimeout(() => playTone(1200, 0.15, 'sine', 0.2), 100);
+}
+
+function playWrongSound() {
+  playTone(150, 0.2, 'sawtooth', 0.12);
+}
+
+const quizData = [
+{
+id: 1, type: "grammar", section: "A Circle the correct word or phrase.",
+questionHTML: "1. Elizabeth <b>usually goes</b> / <b>is usually going</b> to bed at around eleven o'clock.",
+options: [
+  { label: "A", html: "usually goes", isCorrect: true },
+  { label: "B", html: "is usually going", isCorrect: false },
+  { label: "C", html: "usually go", isCorrect: false },
+  { label: "D", html: "going usually", isCorrect: false }
+],
+explanationHTML: "<p>A. usually goes: thường đi (thì hiện tại đơn)<br>B. is usually going: sai cấu trúc (thì hiện tại tiếp diễn không dùng với usually chỉ thói quen chung)<br>C. usually go: sai ngữ pháp (Elizabeth là số ít nên động từ thêm -es)<br>D. going usually: sai ngữ pháp</p><p>Dịch: Elizabeth thường đi ngủ vào khoảng 11 giờ.</p><p>Đáp án đúng là A vì đây là một thói quen ở hiện tại, dùng thì hiện tại đơn.</p>"
+},
+{
+id: 2, type: "grammar",
+questionHTML: "2. Dan <b>talks</b> / <b>is talking</b> on the other phone right now.",
+options: [
+  { label: "A", html: "talks", isCorrect: false },
+  { label: "B", html: "is talking", isCorrect: true },
+  { label: "C", html: "talked", isCorrect: false },
+  { label: "D", html: "has talked", isCorrect: false }
+],
+explanationHTML: "<p>A. talks: nói (hiện tại đơn)<br>B. is talking: đang nói (hiện tại tiếp diễn)<br>C. talked: đã nói (quá khứ đơn)<br>D. has talked: đã nói (hiện tại hoàn thành)</p><p>Dịch: Dan hiện đang nói chuyện trên một điện thoại khác.</p><p>Đáp án đúng là B vì có dấu hiệu 'right now' (ngay bây giờ), diễn tả hành động đang diễn ra tại thời điểm nói.</p>"
+},
+{
+id: 3, type: "grammar",
+questionHTML: "3. We <b>don't eat</b> / <b>aren't eating</b> any meat at the moment as we're both on a diet.",
+options: [
+  { label: "A", html: "don't eat", isCorrect: false },
+  { label: "B", html: "aren't eating", isCorrect: true },
+  { label: "C", html: "haven't eaten", isCorrect: false },
+  { label: "D", html: "didn't eat", isCorrect: false }
+],
+explanationHTML: "<p>A. don't eat: hiện tại đơn<br>B. aren't eating: hiện tại tiếp diễn<br>C. haven't eaten: hiện tại hoàn thành<br>D. didn't eat: quá khứ đơn</p><p>Dịch: Chúng tôi hiện không ăn thịt vì cả hai đều đang ăn kiêng.</p><p>Đáp án đúng là B vì có cụm 'at the moment' chỉ hành động đang/tạm thời diễn ra.</p>"
+},
+{
+id: 4, type: "grammar",
+questionHTML: "4. <b>Does air travel get</b> / <b>Is air travel getting</b> increasingly safe?",
+options: [
+  { label: "A", html: "Does air travel get", isCorrect: false },
+  { label: "B", html: "Is air travel getting", isCorrect: true },
+  { label: "C", html: "Has air travel got", isCorrect: false },
+  { label: "D", html: "Do air travel get", isCorrect: false }
+],
+explanationHTML: "<p>A. Does air travel get: hiện tại đơn<br>B. Is air travel getting: hiện tại tiếp diễn<br>C. Has air travel got: hiện tại hoàn thành<br>D. Do air travel get: sai ngữ pháp (air travel là số ít)</p><p>Dịch: Đi lại bằng đường hàng không có đang ngày càng an toàn hơn không?</p><p>Đáp án đúng là B vì mô tả một sự thay đổi đang diễn ra (increasingly safe).</p>"
+},
+{
+id: 5, type: "grammar",
+questionHTML: "5. My mum <b>calls</b> / <b>is calling</b> me every weekend without fail.",
+options: [
+  { label: "A", html: "calls", isCorrect: true },
+  { label: "B", html: "is calling", isCorrect: false },
+  { label: "C", html: "has called", isCorrect: false },
+  { label: "D", html: "called", isCorrect: false }
+],
+explanationHTML: "<p>A. calls: gọi (hiện tại đơn)<br>B. is calling: đang gọi (hiện tại tiếp diễn)<br>C. has called: hiện tại hoàn thành<br>D. called: quá khứ đơn</p><p>Dịch: Mẹ tôi gọi tôi mỗi cuối tuần mà không bao giờ quên.</p><p>Đáp án đúng là A vì có cụm 'every weekend' chỉ thói quen.</p>"
+},
+{
+id: 6, type: "grammar",
+questionHTML: "6. How much <b>do babysitters generally earn</b> / <b>are babysitters generally earning</b>?",
+options: [
+  { label: "A", html: "do babysitters generally earn", isCorrect: true },
+  { label: "B", html: "are babysitters generally earning", isCorrect: false },
+  { label: "C", html: "have babysitters generally earned", isCorrect: false },
+  { label: "D", html: "generally earn do babysitters", isCorrect: false }
+],
+explanationHTML: "<p>A. do babysitters generally earn: hiện tại đơn<br>B. are babysitters generally earning: hiện tại tiếp diễn<br>C. have babysitters generally earned: hiện tại hoàn thành<br>D. sai cấu trúc</p><p>Dịch: Những người trông trẻ thường kiếm được bao nhiêu tiền?</p><p>Đáp án đúng là A vì hỏi về một sự thật chung, có từ 'generally'.</p>"
+},
+{
+id: 7, type: "grammar",
+questionHTML: "7. You <b>always come</b> / <b>'re always coming</b> up with excuses for not having done your homework. It's so annoying!",
+options: [
+  { label: "A", html: "always come", isCorrect: false },
+  { label: "B", html: "'re always coming", isCorrect: true },
+  { label: "C", html: "have always come", isCorrect: false },
+  { label: "D", html: "always came", isCorrect: false }
+],
+explanationHTML: "<p>A. always come: hiện tại đơn<br>B. 're always coming: hiện tại tiếp diễn với always<br>C. have always come: hiện tại hoàn thành<br>D. always came: quá khứ đơn</p><p>Dịch: Bạn luôn viện cớ cho việc chưa làm bài tập. Thật khó chịu!</p><p>Đáp án đúng là B vì thì HTTD đi với 'always' để phàn nàn về một thói quen gây bực mình.</p>"
+},
+{
+id: 8, type: "grammar",
+questionHTML: "8. I <b>don't go</b> / <b>'m not going</b> out much during the week but I <b>always try</b> / <b>'m always trying</b> to go out somewhere on Saturday night.",
+options: [
+  { label: "A", html: "don't go / always try", isCorrect: true },
+  { label: "B", html: "'m not going / 'm always trying", isCorrect: false },
+  { label: "C", html: "don't go / 'm always trying", isCorrect: false },
+  { label: "D", html: "'m not going / always try", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi thường không ra ngoài nhiều trong tuần nhưng luôn cố gắng đi đâu đó vào tối thứ Bảy.</p><p>Đáp án đúng là A vì cả hai vế đều diễn tả thói quen chung ở hiện tại.</p>"
+},
+{
+id: 9, type: "grammar",
+questionHTML: "9. No, the train <b>does stop</b> / <b>is stopping</b> at Cirencester on Saturdays.",
+options: [
+  { label: "A", html: "does stop", isCorrect: true },
+  { label: "B", html: "is stopping", isCorrect: false },
+  { label: "C", html: "stop", isCorrect: false },
+  { label: "D", html: "has stopped", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Không, tàu có dừng ở Cirencester vào các ngày thứ Bảy.</p><p>Đáp án đúng là A. Đây là dạng nhấn mạnh của thì hiện tại đơn (dùng trợ động từ 'do/does' + V) để phản bác ý kiến trước đó về lịch trình.</p>"
+},
+{
+id: 10, type: "grammar",
+questionHTML: "10. My mum <b>takes</b> / <b>is taking</b> part in ice-skating competitions almost every weekend.",
+options: [
+  { label: "A", html: "takes", isCorrect: true },
+  { label: "B", html: "is taking", isCorrect: false },
+  { label: "C", html: "has taken", isCorrect: false },
+  { label: "D", html: "took", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Mẹ tôi tham gia các cuộc thi trượt băng nghệ thuật hầu như mỗi cuối tuần.</p><p>Đáp án đúng là A vì đây là thói quen ('almost every weekend').</p>"
+},
+{
+id: 11, type: "grammar", section: "B Rewrite correctly. Change the words or phrases in bold.",
+questionHTML: "1. My dad <b>is often getting up</b> late on Saturday mornings.",
+options: [
+  { label: "A", html: "often gets up", isCorrect: true },
+  { label: "B", html: "gets often up", isCorrect: false },
+  { label: "C", html: "has often got up", isCorrect: false },
+  { label: "D", html: "is often getting up", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bố tôi thường dậy muộn vào các buổi sáng thứ Bảy.</p><p>Đáp án đúng là A vì đây là thói quen nên dùng hiện tại đơn. B sai vị trí trạng từ often.</p>"
+},
+{
+id: 12, type: "grammar",
+questionHTML: "2. <b>Are you speaking</b> any other languages apart from English?",
+options: [
+  { label: "A", html: "Do you speak", isCorrect: true },
+  { label: "B", html: "Are you speak", isCorrect: false },
+  { label: "C", html: "Have you speak", isCorrect: false },
+  { label: "D", html: "Did you spoke", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn có nói ngôn ngữ nào khác ngoài tiếng Anh không?</p><p>Đáp án đúng là A vì chỉ khả năng nói một ngôn ngữ dùng hiện tại đơn.</p>"
+},
+{
+id: 13, type: "grammar",
+questionHTML: "3. I <b>already buy</b> all my Christmas presents and it's only October!",
+options: [
+  { label: "A", html: "have already bought", isCorrect: true },
+  { label: "B", html: "already bought", isCorrect: false },
+  { label: "C", html: "am already buying", isCorrect: false },
+  { label: "D", html: "have already buy", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi đã mua xong tất cả quà Giáng sinh rồi và bây giờ mới tháng Mười!</p><p>Đáp án đúng là A vì hành động đã hoàn tất trước hiện tại và có kết quả/ảnh hưởng ở hiện tại, dùng hiện tại hoàn thành với already.</p>"
+},
+{
+id: 14, type: "grammar",
+questionHTML: "4. It's the first time I<b>'m ever having</b> a party at home.",
+options: [
+  { label: "A", html: "'ve ever had", isCorrect: true },
+  { label: "B", html: "ever have", isCorrect: false },
+  { label: "C", html: "had ever had", isCorrect: false },
+  { label: "D", html: "'ll ever have", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Đây là lần đầu tiên tôi từng tổ chức tiệc ở nhà.</p><p>Đáp án đúng là A. Cấu trúc It is the first time + S + have/has + V-p2 (hiện tại hoàn thành).</p>"
+},
+{
+id: 15, type: "grammar",
+questionHTML: "5. Actually, I think Darren <b>does works</b> quite hard sometimes.",
+options: [
+  { label: "A", html: "does work", isCorrect: true },
+  { label: "B", html: "do works", isCorrect: false },
+  { label: "C", html: "is working", isCorrect: false },
+  { label: "D", html: "has worked", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Thật ra, tôi nghĩ đôi khi Darren cũng làm việc khá chăm chỉ đấy chứ.</p><p>Đáp án đúng là A. Để nhấn mạnh hành động, ta dùng trợ động từ do/does/did + V nguyên thể. Vì vậy 'works' phải bỏ 's'.</p>"
+},
+{
+id: 16, type: "grammar",
+questionHTML: "6. Carlo <b>is never eating</b> Chinese food before.",
+options: [
+  { label: "A", html: "has never eaten", isCorrect: true },
+  { label: "B", html: "never eats", isCorrect: false },
+  { label: "C", html: "has never ate", isCorrect: false },
+  { label: "D", html: "had never eat", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Carlo chưa từng ăn món ăn Trung Quốc trước đây.</p><p>Đáp án đúng là A vì chỉ một trải nghiệm chưa từng có tính đến thời điểm hiện tại (before), dùng HTHT.</p>"
+},
+{
+id: 17, type: "grammar",
+questionHTML: "7. Sean <b>already books</b> a table for tonight.",
+options: [
+  { label: "A", html: "has already booked", isCorrect: true },
+  { label: "B", html: "already booked", isCorrect: false },
+  { label: "C", html: "is already booking", isCorrect: false },
+  { label: "D", html: "has already book", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Sean đã đặt bàn cho tối nay rồi.</p><p>Đáp án đúng là A vì hành động đã hoàn tất và kết quả là tối nay đã có bàn, dùng HTHT với already.</p>"
+},
+{
+id: 18, type: "grammar",
+questionHTML: "8. <b>Needs Melanie</b> any help painting her new flat?",
+options: [
+  { label: "A", html: "Does Melanie need", isCorrect: true },
+  { label: "B", html: "Is Melanie needing", isCorrect: false },
+  { label: "C", html: "Has Melanie needed", isCorrect: false },
+  { label: "D", html: "Do Melanie need", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Melanie có cần giúp đỡ việc sơn căn hộ mới không?</p><p>Đáp án đúng là A vì câu hỏi với động từ thường 'need' ở hiện tại phải mượn trợ động từ do/does.</p>"
+},
+{
+id: 19, type: "grammar", section: "C Complete using the correct form of the verb in brackets.",
+questionHTML: "1. It's the first time ................................................. (I / ever / eat) octopus!",
+options: [
+  { label: "A", html: "I have ever eaten", isCorrect: true },
+  { label: "B", html: "I ever eat", isCorrect: false },
+  { label: "C", html: "I am ever eating", isCorrect: false },
+  { label: "D", html: "I have ever ate", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Đây là lần đầu tiên tôi từng ăn bạch tuộc!</p><p>Đáp án đúng là A do cấu trúc It is the first time + HTHT.</p>"
+},
+{
+id: 20, type: "grammar",
+questionHTML: "2. Sandy ................................................. (not / see) his sister since she went to university.",
+options: [
+  { label: "A", html: "hasn't seen", isCorrect: true },
+  { label: "B", html: "doesn't see", isCorrect: false },
+  { label: "C", html: "isn't seeing", isCorrect: false },
+  { label: "D", html: "didn't see", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Sandy đã không gặp chị gái từ khi cô ấy vào đại học.</p><p>Đáp án đúng là A vì có 'since' + mốc thời gian quá khứ, vế chính dùng HTHT.</p>"
+},
+{
+id: 21, type: "grammar",
+questionHTML: "3. They ................................................. (go) on holiday to Spain and won't be back until the end of the month.",
+options: [
+  { label: "A", html: "have gone", isCorrect: true },
+  { label: "B", html: "have been", isCorrect: false },
+  { label: "C", html: "go", isCorrect: false },
+  { label: "D", html: "are going", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Họ đã đi nghỉ ở Tây Ban Nha và sẽ không về cho đến cuối tháng.</p><p>Đáp án đúng là A. 'have gone to' nghĩa là đã đi nhưng chưa về.</p>"
+},
+{
+id: 22, type: "grammar",
+questionHTML: "4. Poor Tracy! She ................................................. (write) that essay for hours now and she still hasn't finished!",
+options: [
+  { label: "A", html: "has been writing", isCorrect: true },
+  { label: "B", html: "has written", isCorrect: false },
+  { label: "C", html: "is writing", isCorrect: false },
+  { label: "D", html: "writes", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tội nghiệp Tracy! Cô ấy đã đang viết bài luận đó hàng giờ rồi và vẫn chưa xong!</p><p>Đáp án đúng là A vì hành động kéo dài liên tục từ quá khứ đến hiện tại (for hours now) và vẫn chưa hoàn tất, dùng HTHT tiếp diễn.</p>"
+},
+{
+id: 23, type: "grammar",
+questionHTML: "5. ................................................. (you / ever / meet) anyone famous?",
+options: [
+  { label: "A", html: "Have you ever met", isCorrect: true },
+  { label: "B", html: "Do you ever meet", isCorrect: false },
+  { label: "C", html: "Did you ever meet", isCorrect: false },
+  { label: "D", html: "Are you ever meeting", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn đã từng gặp ai nổi tiếng chưa?</p><p>Đáp án đúng là A vì hỏi trải nghiệm từ trước đến nay, dùng HTHT với ever.</p>"
+},
+{
+id: 24, type: "grammar",
+questionHTML: "6. ................................................. (I / try) to get in touch with Jenny all morning but I can't find her anywhere.",
+options: [
+  { label: "A", html: "I've been trying", isCorrect: true },
+  { label: "B", html: "I've tried", isCorrect: false },
+  { label: "C", html: "I try", isCorrect: false },
+  { label: "D", html: "I'm trying", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi đã và đang cố gắng liên lạc với Jenny cả sáng nay nhưng không tìm thấy cô ấy đâu.</p><p>Đáp án đúng là A vì hành động diễn ra liên tục cả buổi sáng (all morning), dùng HTHT tiếp diễn.</p>"
+},
+{
+id: 25, type: "grammar",
+questionHTML: "7. ................................................. (I / not finish) the book yet so I can't tell you what happens.",
+options: [
+  { label: "A", html: "I haven't finished", isCorrect: true },
+  { label: "B", html: "I don't finish", isCorrect: false },
+  { label: "C", html: "I'm not finishing", isCorrect: false },
+  { label: "D", html: "I didn't finish", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi vẫn chưa đọc xong cuốn sách nên tôi không thể kể bạn nghe chuyện gì xảy ra.</p><p>Đáp án đúng là A vì có dấu hiệu 'yet' ở cuối câu phủ định, dùng HTHT.</p>"
+},
+{
+id: 26, type: "grammar",
+questionHTML: "8. ................................................. (you / already / decide) where you're going this summer?",
+options: [
+  { label: "A", html: "Have you already decided", isCorrect: true },
+  { label: "B", html: "Do you already decide", isCorrect: false },
+  { label: "C", html: "Are you already deciding", isCorrect: false },
+  { label: "D", html: "Did you already decide", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn đã quyết định xong đi đâu hè này chưa?</p><p>Đáp án đúng là A vì hành động đã hoàn tất tính đến hiện tại.</p>"
+},
+{
+id: 27, type: "grammar",
+questionHTML: "9. ................................................. (We / live) here for the last six years.",
+options: [
+  { label: "A", html: "We've been living", isCorrect: true },
+  { label: "B", html: "We live", isCorrect: false },
+  { label: "C", html: "We're living", isCorrect: false },
+  { label: "D", html: "We lived", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Chúng tôi đã sống ở đây suốt 6 năm qua.</p><p>Đáp án đúng là A vì hành động kéo dài từ quá khứ đến hiện tại có 'for the last six years', thường dùng HTHT tiếp diễn để nhấn mạnh quá trình liên tục (We've lived cũng được nhưng We've been living tự nhiên hơn cho việc sinh sống liên tục).</p>"
+},
+{
+id: 28, type: "grammar",
+questionHTML: "10. ................................................. (I / never / hear) such nonsense!",
+options: [
+  { label: "A", html: "I've never heard", isCorrect: true },
+  { label: "B", html: "I never hear", isCorrect: false },
+  { label: "C", html: "I'm never hearing", isCorrect: false },
+  { label: "D", html: "I never heard", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi chưa từng nghe những điều vô lý như vậy!</p><p>Đáp án đúng là A vì chỉ một trải nghiệm chưa từng có từ trước đến nay.</p>"
+},
+{
+id: 29, type: "grammar", section: "D Complete using the words in the box. (already, before, ever, for, just, rarely, since, so, still, yet)",
+questionHTML: "1. Have you ........................................ dreamt of winning the lottery?",
+options: [
+  { label: "A", html: "ever", isCorrect: true },
+  { label: "B", html: "never", isCorrect: false },
+  { label: "C", html: "already", isCorrect: false },
+  { label: "D", html: "yet", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn đã bao giờ mơ trúng xổ số chưa?</p><p>Đáp án đúng là A. ever dùng trong câu hỏi thì HTHT mang nghĩa 'đã từng bao giờ'.</p>"
+},
+{
+id: 30, type: "grammar",
+questionHTML: "2. I haven't worked out how to set the timer on the video ........................................ .",
+options: [
+  { label: "A", html: "yet", isCorrect: true },
+  { label: "B", html: "already", isCorrect: false },
+  { label: "C", html: "still", isCorrect: false },
+  { label: "D", html: "just", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi vẫn chưa tìm ra cách cài đặt hẹn giờ trên video.</p><p>Đáp án đúng là A. yet đứng cuối câu phủ định HTHT mang nghĩa 'chưa'.</p>"
+},
+{
+id: 31, type: "grammar",
+questionHTML: "3. My dad's lived in the same house ........................................ he was born.",
+options: [
+  { label: "A", html: "since", isCorrect: true },
+  { label: "B", html: "for", isCorrect: false },
+  { label: "C", html: "from", isCorrect: false },
+  { label: "D", html: "when", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bố tôi đã sống trong cùng một ngôi nhà từ khi ông sinh ra.</p><p>Đáp án đúng là A. since + mốc thời gian / mệnh đề quá khứ.</p>"
+},
+{
+id: 32, type: "grammar",
+questionHTML: "4. The film's only been on ........................................ a couple of minutes.",
+options: [
+  { label: "A", html: "for", isCorrect: true },
+  { label: "B", html: "since", isCorrect: false },
+  { label: "C", html: "in", isCorrect: false },
+  { label: "D", html: "during", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Phim mới chỉ chiếu được vài phút.</p><p>Đáp án đúng là A. for + khoảng thời gian (a couple of minutes).</p>"
+},
+{
+id: 33, type: "grammar",
+questionHTML: "5. Bruce has knocked three men out of the competition ........................................ far.",
+options: [
+  { label: "A", html: "so", isCorrect: true },
+  { label: "B", html: "as", isCorrect: false },
+  { label: "C", html: "how", isCorrect: false },
+  { label: "D", html: "that", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bruce đã loại ba người khỏi cuộc thi cho đến nay.</p><p>Đáp án đúng là A. so far = cho đến nay, là dấu hiệu của thì HTHT.</p>"
+},
+{
+id: 34, type: "grammar",
+questionHTML: "6. I ........................................ get the chance to get any exercise - I'm just too busy.",
+options: [
+  { label: "A", html: "rarely", isCorrect: true },
+  { label: "B", html: "already", isCorrect: false },
+  { label: "C", html: "just", isCorrect: false },
+  { label: "D", html: "still", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi hiếm khi có cơ hội tập thể dục - tôi quá bận rộn.</p><p>Đáp án đúng là A vì đây là câu hiện tại đơn chỉ thói quen/tần suất, rarely = hiếm khi.</p>"
+},
+{
+id: 35, type: "grammar",
+questionHTML: "7. He's only ........................................ got home.",
+options: [
+  { label: "A", html: "just", isCorrect: true },
+  { label: "B", html: "yet", isCorrect: false },
+  { label: "C", html: "still", isCorrect: false },
+  { label: "D", html: "already", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Anh ấy vừa mới về tới nhà.</p><p>Đáp án đúng là A. just dùng trong HTHT chỉ hành động vừa mới xảy ra.</p>"
+},
+{
+id: 36, type: "grammar",
+questionHTML: "8. It's eleven o'clock and Todd ........................................ hasn't come home. Where could he be?",
+options: [
+  { label: "A", html: "still", isCorrect: true },
+  { label: "B", html: "yet", isCorrect: false },
+  { label: "C", html: "already", isCorrect: false },
+  { label: "D", html: "just", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Đã 11 giờ rồi mà Todd vẫn chưa về nhà. Anh ấy có thể ở đâu nhỉ?</p><p>Đáp án đúng là A. still đứng trước hasn't để nhấn mạnh sự việc kéo dài hơn dự kiến.</p>"
+},
+{
+id: 37, type: "grammar",
+questionHTML: "9. I've never met Ruth ........................................ . What's she like?",
+options: [
+  { label: "A", html: "before", isCorrect: true },
+  { label: "B", html: "after", isCorrect: false },
+  { label: "C", html: "already", isCorrect: false },
+  { label: "D", html: "yet", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi chưa từng gặp Ruth trước đây. Cô ấy trông như thế nào?</p><p>Đáp án đúng là A. before dùng cuối câu HTHT chỉ kinh nghiệm từ trước đến nay.</p>"
+},
+{
+id: 38, type: "grammar",
+questionHTML: "10. Have you finished ........................................ ? That was quick!",
+options: [
+  { label: "A", html: "already", isCorrect: true },
+  { label: "B", html: "yet", isCorrect: false },
+  { label: "C", html: "still", isCorrect: false },
+  { label: "D", html: "just", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn đã làm xong rồi à? Nhanh thế!</p><p>Đáp án đúng là A. already có thể đứng cuối câu hỏi để thể hiện sự ngạc nhiên khi việc gì đó xong sớm hơn dự kiến.</p>"
+},
+{
+id: 39, type: "grammar", section: "E Choose the correct answer.",
+questionHTML: "1. Ian ........... a shower at the moment, so could you call back in about half an hour?",
+options: [
+  { label: "A", html: "takes", isCorrect: false },
+  { label: "B", html: "is taking", isCorrect: true },
+  { label: "C", html: "has taken", isCorrect: false },
+  { label: "D", html: "has been taking", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Ian đang tắm vào lúc này, nên bạn có thể gọi lại trong nửa giờ nữa không?</p><p>Đáp án đúng là B vì có 'at the moment' chỉ hành động đang diễn ra.</p>"
+},
+{
+id: 40, type: "grammar",
+questionHTML: "2. ........... to Ipswich before?",
+options: [
+  { label: "A", html: "Do you ever go", isCorrect: false },
+  { label: "B", html: "Are you ever going", isCorrect: false },
+  { label: "C", html: "Have you ever been", isCorrect: true },
+  { label: "D", html: "Have you ever been going", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Bạn đã từng đến Ipswich bao giờ chưa?</p><p>Đáp án đúng là C vì hỏi trải nghiệm từ trước tới nay, dùng HTHT. Have been to = đã từng đến.</p>"
+},
+{
+id: 41, type: "grammar",
+questionHTML: "3. I ........... to all the local newspapers and TV stations to complain.",
+options: [
+  { label: "A", html: "already write", isCorrect: false },
+  { label: "B", html: "already writing", isCorrect: false },
+  { label: "C", html: "have already written", isCorrect: true },
+  { label: "D", html: "have already been writing", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi đã viết thư cho tất cả các tờ báo và đài truyền hình địa phương để phàn nàn.</p><p>Đáp án đúng là C. Hành động đã hoàn tất (nhấn mạnh kết quả) nên dùng HTHT, đi với already.</p>"
+},
+{
+id: 42, type: "grammar",
+questionHTML: "4. ........... TV for the last four hours? Turn it off and get some exercise!",
+options: [
+  { label: "A", html: "Do you watch", isCorrect: false },
+  { label: "B", html: "Are you watching", isCorrect: false },
+  { label: "C", html: "Watched you", isCorrect: false },
+  { label: "D", html: "Have you been watching", isCorrect: true }
+],
+explanationHTML: "<p>Dịch: Bạn đã xem TV suốt 4 giờ qua hả? Tắt đi và tập thể dục chút đi!</p><p>Đáp án đúng là D vì nhấn mạnh quá trình liên tục suốt 4 giờ (for the last four hours), dùng HTHTTD.</p>"
+},
+{
+id: 43, type: "grammar",
+questionHTML: "5. Eric, ........... hockey competitively or just for fun?",
+options: [
+  { label: "A", html: "do you usually play", isCorrect: true },
+  { label: "B", html: "are you usually playing", isCorrect: false },
+  { label: "C", html: "have you usually played", isCorrect: false },
+  { label: "D", html: "have you usually been playing", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Eric, bạn thường chơi khúc côn cầu để thi đấu hay chỉ cho vui?</p><p>Đáp án đúng là A. Hỏi về thói quen/sở thích chung, dùng hiện tại đơn với usually.</p>"
+},
+{
+id: 44, type: "grammar",
+questionHTML: "6. That's the first time ........... an answer right today!",
+options: [
+  { label: "A", html: "I get", isCorrect: false },
+  { label: "B", html: "I am getting", isCorrect: false },
+  { label: "C", html: "I have got", isCorrect: true },
+  { label: "D", html: "I have been getting", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Đó là lần đầu tiên tôi có một câu trả lời đúng hôm nay!</p><p>Đáp án đúng là C. Cấu trúc the first time đi với thì hiện tại hoàn thành.</p>"
+},
+{
+id: 45, type: "grammar",
+questionHTML: "7. Jessica has ........... left, I'm afraid.",
+options: [
+  { label: "A", html: "already", isCorrect: true },
+  { label: "B", html: "yet", isCorrect: false },
+  { label: "C", html: "still", isCorrect: false },
+  { label: "D", html: "so far", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Tôi e là Jessica đã đi mất rồi.</p><p>Đáp án đúng là A. already đứng giữa has và phân từ 2, nghĩa là đã hoàn tất.</p>"
+},
+{
+id: 46, type: "grammar",
+questionHTML: "8. Dan ........... in the living room while we redecorate his bedroom.",
+options: [
+  { label: "A", html: "sleeps", isCorrect: false },
+  { label: "B", html: "is sleeping", isCorrect: true },
+  { label: "C", html: "has slept", isCorrect: false },
+  { label: "D", html: "does sleep", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Dan đang ngủ tạm trong phòng khách trong khi chúng tôi trang trí lại phòng ngủ của cậu ấy.</p><p>Đáp án đúng là B vì đây là một tình huống tạm thời, dùng thì hiện tại tiếp diễn.</p>"
+},
+{
+id: 47, type: "grammar",
+questionHTML: "9. Unfortunately, Simone ........... a day off very often.",
+options: [
+  { label: "A", html: "doesn't get", isCorrect: true },
+  { label: "B", html: "isn't getting", isCorrect: false },
+  { label: "C", html: "hasn't got", isCorrect: false },
+  { label: "D", html: "hasn't been getting", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Thật không may, Simone không thường xuyên có ngày nghỉ.</p><p>Đáp án đúng là A. 'very often' chỉ tần suất chung, dùng thì hiện tại đơn.</p>"
+},
+{
+id: 48, type: "grammar",
+questionHTML: "10. Actually, I ........... a cup of tea first thing every morning but then I switch to coffee.",
+options: [
+  { label: "A", html: "do drink", isCorrect: true },
+  { label: "B", html: "am drinking", isCorrect: false },
+  { label: "C", html: "have drunk", isCorrect: false },
+  { label: "D", html: "have been drinking", isCorrect: false }
+],
+explanationHTML: "<p>Dịch: Thật ra, tôi thường uống một tách trà ngay việc đầu tiên mỗi sáng nhưng sau đó tôi chuyển sang cà phê.</p><p>Đáp án đúng là A. Câu nhấn mạnh một thói quen ở hiện tại (every morning), dùng 'do' trước động từ để nhấn mạnh sự thật.</p>"
+}
+];
+
+let userState = {};
+let submitted = false;
+
+function initQuiz() {
+  const container = document.getElementById('quiz-container');
+  quizData.forEach(q => {
+    userState[q.id] = { selected: null, checked: false, isCorrect: null };
+    
+    // Shuffle options array for display
+    let dispOptions = q.options.map(o => ({...o, originalLabel: o.label}));
+    dispOptions.sort(() => 0);
+    
+    // Shuffle labels A,B,C,D
+    let labels = ['A', 'B', 'C', 'D'];
+    labels.sort(() => 0);
+    dispOptions.forEach((o, i) => o.displayLabel = labels[i]);
+    
+    let sectionHtml = '';
+    if (q.section) {
+      sectionHtml = `<div class="section-title">${q.section}</div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${q.id}`;
+    
+    let html = `${sectionHtml}
+      <div class="question-text">${q.questionHTML}</div>
+      <div class="options">`;
+    
+    dispOptions.forEach(opt => {
+      html += `<button class="option-btn" id="btn-${q.id}-${opt.originalLabel}" onclick="selectOption(${q.id}, '${opt.originalLabel}')">
+        ${opt.displayLabel}. ${opt.html}
+      </button>`;
+    });
+
+    html += `</div>
+      <button class="check-btn" id="check-${q.id}" onclick="checkAnswer(${q.id})" disabled>Kiểm tra</button>
+      <div style="clear:both;"></div>
+      <div class="explanation" id="exp-${q.id}">${q.explanationHTML}</div>`;
+    
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+function selectOption(qId, origLabel) {
+  if (userState[qId].checked) return;
+  
+  userState[qId].selected = origLabel;
+  playSelectSound();
+  
+  // Reset all buttons in this question
+  const card = document.getElementById(`card-${qId}`);
+  const btns = card.querySelectorAll('.option-btn');
+  btns.forEach(b => b.classList.remove('pending'));
+  
+  // Highlight selected
+  document.getElementById(`btn-${qId}-${origLabel}`).classList.add('pending');
+  document.getElementById(`check-${qId}`).disabled = false;
+  
+  updateProgress();
+}
+
+function checkAnswer(qId, auto = false) {
+  if (userState[qId].checked || userState[qId].selected === null) return;
+  
+  const q = quizData.find(x => x.id === qId);
+  const correctOpt = q.options.find(x => x.isCorrect);
+  
+  userState[qId].isCorrect = (userState[qId].selected === correctOpt.label);
+  userState[qId].checked = true;
+  
+  const card = document.getElementById(`card-${qId}`);
+  const btns = card.querySelectorAll('.option-btn');
+  
+  btns.forEach(b => {
+    b.classList.remove('pending');
+    b.disabled = true;
+  });
+  
+  // Correct green
+  document.getElementById(`btn-${qId}-${correctOpt.label}`).classList.add('correct');
+  
+  if (!userState[qId].isCorrect) {
+    document.getElementById(`btn-${qId}-${userState[qId].selected}`).classList.add('wrong');
+    if (!auto) playWrongSound();
+  } else {
+    if (!auto) playCorrectSound();
+  }
+  
+  document.getElementById(`check-${qId}`).disabled = true;
+  document.getElementById(`check-${qId}`).style.display = 'none';
+  document.getElementById(`exp-${qId}`).style.display = 'block';
+  
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = quizData.length;
+  const answered = Object.values(userState).filter(s => s.selected !== null).length;
+  document.getElementById('progress-fill').style.width = `${(answered/total)*100}%`;
+  document.getElementById('progress-text').innerText = `Đã chọn: ${answered}/${total}`;
+}
+
+function submitQuiz() {
+  if (submitted) return;
+  
+  const studentName = document.getElementById('student-name').value.trim();
+  if (!studentName) {
+    alert("Vui lòng nhập tên trước khi nộp bài!");
+    return;
+  }
+  
+  submitted = true;
+  document.getElementById('submit-btn').disabled = true;
+  
+  let correctCount = 0;
+  let wrongDetails = [];
+  
+  quizData.forEach(q => {
+    if (!userState[q.id].checked) {
+      if (userState[q.id].selected !== null) {
+        checkAnswer(q.id, true);
+      } else {
+        userState[q.id].checked = true;
+        userState[q.id].isCorrect = false;
+        
+        const correctOpt = q.options.find(x => x.isCorrect);
+        const card = document.getElementById(`card-${q.id}`);
+        const btns = card.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+        document.getElementById(`btn-${q.id}-${correctOpt.label}`).classList.add('correct');
+        document.getElementById(`check-${q.id}`).disabled = true;
+        document.getElementById(`check-${q.id}`).style.display = 'none';
+        document.getElementById(`exp-${q.id}`).style.display = 'block';
+      }
+    }
+    
+    if (userState[q.id].isCorrect) correctCount++;
+    else {
+      let sel = userState[q.id].selected || "Bỏ trống";
+      wrongDetails.push(`Câu ${q.id}: Chọn ${sel}`);
+    }
+  });
+  
+  const score = ((correctCount / quizData.length) * 10).toFixed(2);
+  const ratio = `${correctCount}/${quizData.length}`;
+  
+  let message = "";
+  if (correctCount === quizData.length) message = "Tuyệt vời! Bạn đạt điểm tuyệt đối!";
+  else if (correctCount >= quizData.length * 0.8) message = "Rất tốt! Cố gắng duy trì nhé!";
+  else if (correctCount >= quizData.length * 0.5) message = "Khá tốt, nhưng bạn cần ôn tập thêm một chút!";
+  else message = "Cố gắng hơn ở lần sau nhé!";
+  
+  document.getElementById('popup-score').innerText = `Điểm của bạn: ${score} (${ratio})`;
+  document.getElementById('popup-message').innerText = message;
+  document.getElementById('popup-overlay').style.display = 'flex';
+  
+  renderSummaryTable(correctCount === quizData.length);
+  
+  // Submit to Google Form
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSelQyzh_lWyb2vZUnQ1jc1p9FLRknDZiUt9NiUiiX1epHTFLw/formResponse";
+  const formBody = new URLSearchParams({
+    "entry.351633352": "link1",
+    "entry.1895948982": studentName,
+    "entry.1232319784": score,
+    "entry.1125920425": ratio,
+    "entry.1907417670": wrongDetails.join(' | ') || "Không có"
+  });
+  
+  fetch(formUrl, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: formBody.toString()
+  }).catch(e => console.log(e));
+}
+
+function closePopup() {
+  document.getElementById('popup-overlay').style.display = 'none';
+  document.getElementById('summary-container').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderSummaryTable(isPerfect) {
+  const container = document.getElementById('summary-container');
+  const tablesDiv = document.getElementById('summary-tables');
+  container.style.display = 'block';
+  
+  if (isPerfect) {
+    document.getElementById('summary-title').innerText = "Bảng Tổng Kết - Chúc mừng bạn đã đạt điểm tuyệt đối!";
+  }
+  
+  let html = '';
+  const cols = 15;
+  for (let i = 0; i < quizData.length; i += cols) {
+    const chunk = quizData.slice(i, i + cols);
+    html += '<table class="summary-table" style="margin-bottom: 20px;"><tr><th>Câu</th>';
+    
+    chunk.forEach(q => html += `<th>${q.id}</th>`);
+    html += '</tr>';
+    
+    ['A', 'B', 'C', 'D'].forEach(label => {
+      html += `<tr><th>${label}</th>`;
+      chunk.forEach(q => {
+        const state = userState[q.id];
+        const isCorrectOpt = q.options.find(x => x.isCorrect).label === label;
+        
+        let cellClass = "";
+        if (state.selected === null) {
+          cellClass = "empty-col";
+        } else if (isCorrectOpt) {
+          cellClass = "correct-cell";
+        } else if (state.selected === label && !state.isCorrect) {
+          cellClass = "wrong-cell";
+        }
+        
+        html += `<td class="${cellClass}">${label}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+  }
+  tablesDiv.innerHTML = html;
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
