@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>link1</title>
+<title>Unit 1 (Sections A-E)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -339,18 +339,46 @@ body {
 }
 </style>
 
+<style>
+
+/* PROGRESS BAR CSS */
+.progress-container {
+  max-width: 800px;
+  margin: 0 auto 20px;
+  background: #E2E8F0;
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: #4F46E5;
+  width: 0%;
+  transition: width 0.3s;
+}
+.progress-text-container {
+  text-align: center;
+  font-size: 15px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #475569;
+}
+
+</style>
 </head>
 <body>
 <div style="text-align: left; margin-bottom: 20px; font-weight: 600; color: #64748B; font-size: 15px;">GV biên soạn: Ms Chí Nên - 0852639652</div>
 
+
+<div class="progress-text-container"><span id="top-progress-text">0</span> / <span id="top-total-text">0</span> answered</div>
+<div class="progress-container"><div class="progress-bar-inner" id="top-progress-bar"></div></div>
+
 <div class="header">
-  <h1>Unit 1 Grammar</h1>
+  <h1>Unit 1 (Sections A-E)</h1>
   <div class="header-input">
     <input type="text" id="student-name" placeholder="Nhập tên của bạn để nộp bài...">
   </div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill"></div>
-  </div>
+  
   <div class="progress-text" id="progress-text">Đã chọn: 0/48</div>
 </div>
 
@@ -994,10 +1022,10 @@ function initQuiz() {
   });
 }
 
-function selectOption(qId, origLabel) {
+function selectOption(qId, origLabel) { updateTopProgress(); 
   if (userState[qId].checked) return;
   
-  userState[qId].selected = origLabel;
+  userState[qId].selected = origLabel; updateTopProgress();
   playSelectSound();
   
   // Reset all buttons in this question
@@ -1175,6 +1203,25 @@ function renderSummaryTable(isPerfect) {
 }
 
 window.onload = initQuiz;
+
+function updateTopProgress() {
+    let answered = 0;
+    if (typeof userState !== 'undefined') {
+        answered = Object.values(userState).filter(s => s.selected !== null || s.checked).length;
+    }
+    const pt = document.getElementById('top-progress-text');
+    const pb = document.getElementById('top-progress-bar');
+    const tt = document.getElementById('top-total-text');
+    
+    if (pt) pt.textContent = answered;
+    if (tt && typeof quizData !== 'undefined') tt.textContent = quizData.length;
+    if (pb && typeof quizData !== 'undefined' && quizData.length > 0) {
+        pb.style.width = (answered / quizData.length * 100) + '%';
+    }
+}
+// Init progress on load
+document.addEventListener('DOMContentLoaded', updateTopProgress);
+
 </script>
 <div class="footer-text">GV biên soạn: Ms Chí Nên - 0852639652</div>
 </body>
