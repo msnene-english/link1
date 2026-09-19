@@ -5,885 +5,345 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unit 1 (Sections A-E)</title>
     <style>
-        :root{
-            --color-primary:#4F46E5;
-            --color-secondary:#06B6D4;
-            --color-accent:#F59E0B;
-            --color-bg:#F8FAFC;
-            --color-card:#FFFFFF;
-            --color-correct:#22C55E;
-            --color-wrong:#EF4444;
-            --color-selecting:#2563EB;
-            --color-pending:#FEF3C7;
-            --color-pending-text:#92400E;
-            font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
-        }
-        body {
-            background-color: var(--color-bg);
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .watermark {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.4);
-            z-index: 1000;
-            pointer-events: none;
-            font-weight: bold;
-        }
-        .footer-watermark {
-            text-align: center;
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.4);
-            padding: 20px;
-            font-weight: bold;
-        }
-        #intro-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: var(--color-bg);
-        }
-        #intro-screen h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-        #intro-screen input {
-            padding: 12px 20px;
-            font-size: 18px;
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            outline: none;
-            width: 300px;
-            max-width: 90%;
-        }
-        #intro-screen input:focus {
-            border-color: var(--color-primary);
-        }
-        #intro-screen button {
-            padding: 14px 40px;
-            font-size: 17px;
-            font-weight: 600;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        #intro-screen button:hover {
-            opacity: 0.9;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
+        /* Make sure watermark doesn't overlap progress bar */
+        .watermark { position: fixed; top: 30px; left: 10px; font-weight: bold; color: rgba(0, 0, 0, 0.3); z-index: 99; pointer-events: none; font-size: 14px; }
+        .footer-watermark { text-align: center; padding: 20px; font-weight: bold; color: rgba(0, 0, 0, 0.5); font-size: 14px; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #2c3e50; }
         
-        #quiz-screen {
-            display: none;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-top: 60px;
-        }
-        .progress-bar-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: var(--color-card);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        .progress-track {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--color-primary);
-            width: 0%;
-            transition: width 0.3s;
-        }
+        .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 5px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .progress-bar { height: 10px; background-color: #3498db; border-radius: 5px; width: 0%; transition: width 0.3s; }
         
-        .card {
-            background: var(--color-card);
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,.08);
-            padding: 24px;
-            margin-bottom: 24px;
-            overflow-wrap: break-word;
-        }
-        .question-text {
-            font-size: 21px;
-            font-weight: 600;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+        .screen { display: none; }
+        .screen.active { display: block; }
         
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .option-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 500;
-            line-height: 1.6;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        .option-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-color: #cbd5e1;
-        }
-        .option-item.pending {
-            background-color: var(--color-pending);
-            color: var(--color-pending-text);
-            border-color: var(--color-accent);
-            transform: scale(1.02);
-        }
-        .option-item.correct {
-            background-color: var(--color-correct);
-            color: white;
-            border-color: var(--color-correct);
-        }
-        .option-item.wrong {
-            background-color: var(--color-wrong);
-            color: white;
-            border-color: var(--color-wrong);
-            animation: shake 0.2s;
-        }
-        .option-label {
-            font-weight: 700;
-            margin-right: 15px;
-            min-width: 24px;
-        }
+        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; border: none; padding: 12px 20px; text-align: center; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.3s; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
         
-        .gap-input {
-            font-size: 18px;
-            font-weight: 500;
-            padding: 4px 8px;
-            border: none;
-            border-bottom: 2px solid #cbd5e1;
-            background: transparent;
-            outline: none;
-            text-align: center;
-            min-width: 100px;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .gap-input:focus {
-            border-bottom-color: var(--color-primary);
-        }
-        .gap-input.pending {
-            background-color: var(--color-pending);
-            color: var(--color-pending-text);
-        }
-        .gap-input.correct {
-            border-bottom-color: var(--color-correct);
-            color: var(--color-correct);
-            font-weight: bold;
-        }
-        .gap-input.wrong {
-            border-bottom-color: var(--color-wrong);
-            color: var(--color-wrong);
-            text-decoration: line-through;
-            animation: shake 0.2s;
-        }
-        .correct-answer-text {
-            color: var(--color-correct);
-            font-weight: bold;
-            margin-left: 8px;
-        }
+        .question-block { margin-bottom: 25px; padding: 15px; background: #f9f9f9; border-left: 4px solid #3498db; border-radius: 4px; }
+        .question-text { font-size: 17px; font-weight: 600; margin-bottom: 15px; line-height: 1.6; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
         
-        .btn-check {
-            margin-top: 20px;
-            padding: 14px 20px;
-            font-size: 17px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            min-height: 52px;
-            background: var(--color-primary);
-            color: white;
-            transition: all 0.2s;
-        }
-        .btn-check:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        .btn-check:not(:disabled):hover {
-            opacity: 0.9;
-        }
+        .options label { display: block; margin-bottom: 8px; cursor: pointer; padding: 10px; border-radius: 4px; transition: background 0.2s; border: 1px solid transparent; font-size: 16px; }
+        .options label:hover { background: #eef; }
+        .options input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
         
-        .explanation {
-            display: none;
-            margin-top: 20px;
-            padding: 16px;
-            background: #f1f5f9;
-            border-radius: 8px;
-            font-size: 17px;
-            line-height: 1.8;
-            border-left: 4px solid var(--color-primary);
-        }
+        .check-btn { width: auto; padding: 8px 15px; font-size: 14px; margin-top: 15px; display: inline-block; }
         
-        .submit-container {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 60px;
-        }
-        .btn-submit {
-            padding: 16px 48px;
-            font-size: 19px;
-            font-weight: 700;
-            background: var(--color-secondary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .btn-submit:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
+        .explanation { margin-top: 15px; padding: 15px; background: #e8f4fd; border: 1px solid #b6d4fe; border-radius: 5px; display: none; font-size: 15px; line-height: 1.6; }
+        .explanation strong, .explanation b { color: #0056b3; }
         
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
+        .correct-opt { background: #d4edda !important; border-color: #c3e6cb !important; }
+        .wrong-opt { background: #f8d7da !important; border-color: #f5c6cb !important; }
         
-        .locked {
-            pointer-events: none;
-            user-select: none;
-        }
+        /* Gap fill inline */
+        .gap-fill-input { width: 120px !important; display: inline-block !important; padding: 5px !important; margin: 0 5px !important; text-align: center; font-weight: bold; color: #2c3e50; font-size: 16px; border-bottom: 2px solid #3498db; background: transparent; }
+        .correct-input { border-color: #27ae60 !important; background-color: #d4edda !important; }
+        .wrong-input { border-color: #e74c3c !important; background-color: #f8d7da !important; }
+        .correct-answer-text { color: #27ae60; font-weight: bold; margin-left: 5px; }
         
-        #results-section {
-            display: none;
-            margin-top: 40px;
-        }
-        #results-section h2 {
-            font-size: 22px;
-            color: var(--color-wrong);
-            border-bottom: 2px solid var(--color-wrong);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
+        /* Reordering */
+        .word-bank, .drop-zone { min-height: 50px; padding: 10px; border: 2px dashed #ccc; border-radius: 5px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; background: #fff; width: 100%; }
+        .drop-zone { border-color: #3498db; background: #f0f8ff; }
+        .word-chip { padding: 8px 15px; background-color: #3498db; color: white; border-radius: 20px; cursor: pointer; user-select: none; font-size: 16px; transition: transform 0.1s, background 0.2s; display: inline-block; }
+        .word-chip:hover { background-color: #2980b9; transform: scale(1.05); }
         
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        .modal-desc {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        .modal-btn {
-            padding: 10px 24px;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        .submit-btn { background-color: #27ae60; font-size: 18px; padding: 15px; margin-top: 30px; }
+        .submit-btn:hover { background-color: #219653; }
         
-        @media (max-width: 600px) {
-            .question-text { font-size: 20px; }
-            .option-item, .gap-input { font-size: 17px; }
-            .explanation { font-size: 16px; }
-            .btn-check { font-size: 16px; }
-        }
+        .result-score { font-size: 28px; text-align: center; font-weight: bold; color: #27ae60; margin: 30px 0; }
+        
+        /* Sentence rewrite */
+        textarea.rewrite-input { width: 100%; height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; font-family: inherit; resize: vertical; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="watermark">GV biên soạn: Ms Chí Nên - 0852639652</div>
-    
-    <div id="intro-screen">
-        <h1>Nhập tên học sinh</h1>
-        <input type="text" id="student-name" placeholder="Họ và tên..." autocomplete="off">
-        <button onclick="startQuiz()">Bắt đầu làm bài</button>
+
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <h1>Unit 1 (Sections A-E)</h1>
+            <p style="text-align:center; font-size: 18px; margin-bottom: 30px;">Vui lòng nhập họ và tên của bạn để bắt đầu làm bài.</p>
+            <input type="text" id="studentName" placeholder="Nhập họ và tên..." required>
+            <button onclick="startTest()">Bắt đầu làm bài</button>
+        </div>
+
+        <!-- Test Screen -->
+        <div id="testScreen" class="screen">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <h2>Unit 1 (Sections A-E)</h2>
+            <div id="questionsContainer"></div>
+            <button class="submit-btn" onclick="submitTest()">Nộp bài</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <h2>Kết quả bài làm</h2>
+            <div id="scoreDisplay" class="result-score"></div>
+            <p style="text-align:center; font-size: 16px;">(Kết quả đã được gửi cho giáo viên)</p>
+            <button onclick="location.reload()">Làm lại</button>
+        </div>
     </div>
 
-    <div id="quiz-screen">
-        <div class="progress-bar-container">
-            <div class="progress-header">
-                <span>Unit 1 (Sections A-E)</span>
-                <span id="progress-text">0 / 48</span>
-            </div>
-            <div class="progress-track">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-        </div>
-        
-        <div id="quiz-container"></div>
-        
-        <div class="submit-container">
-            <button class="btn-submit" id="btn-submit" onclick="submitQuiz()">Nộp bài</button>
-        </div>
-        
-        <div id="results-section">
-            <h2>DANH SÁCH CÁC CÂU LÀM SAI</h2>
-            <div id="wrong-list"></div>
-        </div>
-        
-        <div class="footer-watermark">GV biên soạn: Ms Chí Nên - 0852639652</div>
-    </div>
-    
-    <div class="modal-overlay" id="result-modal">
-        <div class="modal-content">
-            <div class="modal-title" id="modal-title">Điểm của bạn</div>
-            <div class="modal-desc" id="modal-desc"></div>
-            <button class="modal-btn" onclick="closeModal()">Đóng</button>
-        </div>
-    </div>
+    <div class="footer-watermark">GV biên soạn: Ms Chí Nên - 0852639652</div>
 
     <script>
         const quizData = [{"id": 1, "type": "multiple_choice", "questionHTML": "Elizabeth <b>usually goes / is usually going</b> to bed at around eleven o'clock.", "options": [{"label": "A", "html": "usually goes", "isCorrect": true}, {"label": "B", "html": "is usually going", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Elizabeth th\u01b0\u1eddng \u0111i ng\u1ee7 v\u00e0o kho\u1ea3ng 11 gi\u1edd.<br>Gi\u1ea3i th\u00edch: 'usually' l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a th\u00ec hi\u1ec7n t\u1ea1i \u0111\u01a1n di\u1ec5n t\u1ea3 m\u1ed9t th\u00f3i quen (habit). Do \u0111\u00f3, \u0111\u00e1p \u00e1n \u0111\u00fang l\u00e0 <b>usually goes</b>. 'is usually going' sai v\u00ec d\u00f9ng th\u00ec hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n cho th\u00f3i quen th\u01b0\u1eddng xuy\u00ean."}, {"id": 2, "type": "multiple_choice", "questionHTML": "Dan <b>talks / is talking</b> on the other phone right now.", "options": [{"label": "A", "html": "talks", "isCorrect": false}, {"label": "B", "html": "is talking", "isCorrect": true}], "explanationHTML": "D\u1ecbch: Dan \u0111ang n\u00f3i chuy\u1ec7n tr\u00ean m\u1ed9t chi\u1ebfc \u0111i\u1ec7n tho\u1ea1i kh\u00e1c ngay l\u00fac n\u00e0y.<br>Gi\u1ea3i th\u00edch: 'right now' l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a th\u00ec hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n ch\u1ec9 m\u1ed9t h\u00e0nh \u0111\u1ed9ng \u0111ang x\u1ea3y ra t\u1ea1i th\u1eddi \u0111i\u1ec3m n\u00f3i. Do \u0111\u00f3, <b>is talking</b> l\u00e0 \u0111\u00fang."}, {"id": 3, "type": "multiple_choice", "questionHTML": "We <b>don't eat / aren't eating</b> any meat at the moment as we're both on a diet.", "options": [{"label": "A", "html": "don't eat", "isCorrect": false}, {"label": "B", "html": "aren't eating", "isCorrect": true}], "explanationHTML": "D\u1ecbch: Ch\u00fang t\u00f4i kh\u00f4ng \u0103n th\u1ecbt v\u00e0o l\u00fac n\u00e0y v\u00ec c\u1ea3 hai \u0111ang \u0103n ki\u00eang.<br>Gi\u1ea3i th\u00edch: 'at the moment' l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a th\u00ec hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n ch\u1ec9 m\u1ed9t s\u1ef1 vi\u1ec7c \u0111ang di\u1ec5n ra t\u1ea1m th\u1eddi xung quanh th\u1eddi \u0111i\u1ec3m hi\u1ec7n t\u1ea1i. V\u1eady <b>aren't eating</b> l\u00e0 \u0111\u00fang."}, {"id": 4, "type": "multiple_choice", "questionHTML": "<b>Does air travel get / Is air travel getting</b> increasingly safe?", "options": [{"label": "A", "html": "Does air travel get", "isCorrect": false}, {"label": "B", "html": "Is air travel getting", "isCorrect": true}], "explanationHTML": "D\u1ecbch: \u0110i l\u1ea1i b\u1eb1ng \u0111\u01b0\u1eddng h\u00e0ng kh\u00f4ng c\u00f3 \u0111ang tr\u1edf n\u00ean ng\u00e0y c\u00e0ng an to\u00e0n h\u01a1n kh\u00f4ng?<br>Gi\u1ea3i th\u00edch: 'increasingly' ch\u1ec9 m\u1ed9t s\u1ef1 thay \u0111\u1ed5i \u0111ang di\u1ec5n ra (changing situations). Ta d\u00f9ng th\u00ec hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n. Do \u0111\u00f3 <b>Is air travel getting</b> \u0111\u00fang."}, {"id": 5, "type": "multiple_choice", "questionHTML": "My mum <b>calls / is calling</b> me every weekend without fail.", "options": [{"label": "A", "html": "calls", "isCorrect": true}, {"label": "B", "html": "is calling", "isCorrect": false}], "explanationHTML": "D\u1ecbch: M\u1eb9 t\u00f4i g\u1ecdi t\u00f4i m\u1ed7i cu\u1ed1i tu\u1ea7n m\u00e0 kh\u00f4ng bao gi\u1edd qu\u00ean.<br>Gi\u1ea3i th\u00edch: 'every weekend' di\u1ec5n t\u1ea3 m\u1ed9t th\u00f3i quen l\u1eb7p \u0111i l\u1eb7p l\u1ea1i. Ta d\u00f9ng th\u00ec hi\u1ec7n t\u1ea1i \u0111\u01a1n: <b>calls</b>."}, {"id": 6, "type": "multiple_choice", "questionHTML": "How much <b>do babysitters generally earn / are babysitters generally earning</b>?", "options": [{"label": "A", "html": "do babysitters generally earn", "isCorrect": true}, {"label": "B", "html": "are babysitters generally earning", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Nh\u1eefng ng\u01b0\u1eddi tr\u00f4ng tr\u1ebb th\u01b0\u1eddng ki\u1ebfm \u0111\u01b0\u1ee3c bao nhi\u00eau ti\u1ec1n?<br>Gi\u1ea3i th\u00edch: 'generally' (nh\u00ecn chung, th\u01b0\u1eddng th\u01b0\u1eddng) l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a hi\u1ec7n t\u1ea1i \u0111\u01a1n, ch\u1ec9 m\u1ed9t s\u1ef1 th\u1eadt hi\u1ec3n nhi\u00ean ho\u1eb7c t\u00ecnh tr\u1ea1ng chung. Do \u0111\u00f3 <b>do babysitters generally earn</b> \u0111\u00fang."}, {"id": 7, "type": "multiple_choice", "questionHTML": "<b>You always come / You're always coming</b> up with excuses for not having done your homework. It's so annoying!", "options": [{"label": "A", "html": "You always come", "isCorrect": false}, {"label": "B", "html": "You're always coming", "isCorrect": true}], "explanationHTML": "D\u1ecbch: B\u1ea1n l\u00fac n\u00e0o c\u0169ng b\u1ecba ra l\u00fd do cho vi\u1ec7c kh\u00f4ng l\u00e0m b\u00e0i t\u1eadp. Th\u1eadt kh\u00f3 ch\u1ecbu!<br>Gi\u1ea3i th\u00edch: C\u1ea5u tr\u00fac <i>always + V-ing (hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n)</i> di\u1ec5n t\u1ea3 s\u1ef1 ph\u00e0n n\u00e0n v\u1ec1 m\u1ed9t vi\u1ec7c l\u1eb7p \u0111i l\u1eb7p l\u1ea1i g\u00e2y b\u1ef1c m\u00ecnh. <b>You're always coming</b> \u0111\u00fang."}, {"id": 8, "type": "multiple_choice", "questionHTML": "<b>I don't go / I'm not going</b> out much during the week but <b>I always try / I'm always trying</b> to go out somewhere on Saturday night.", "options": [{"label": "A", "html": "I don't go / I always try", "isCorrect": true}, {"label": "B", "html": "I'm not going / I'm always trying", "isCorrect": false}, {"label": "C", "html": "I don't go / I'm always trying", "isCorrect": false}, {"label": "D", "html": "I'm not going / I always try", "isCorrect": false}], "explanationHTML": "D\u1ecbch: T\u00f4i th\u01b0\u1eddng kh\u00f4ng \u0111i ra ngo\u00e0i nhi\u1ec1u trong tu\u1ea7n nh\u01b0ng t\u00f4i lu\u00f4n c\u1ed1 g\u1eafng \u0111i \u0111\u00e2u \u0111\u00f3 v\u00e0o t\u1ed1i th\u1ee9 B\u1ea3y.<br>Gi\u1ea3i th\u00edch: C\u1ea3 2 v\u1ebf \u0111\u1ec1u n\u00f3i v\u1ec1 m\u1ed9t th\u00f3i quen chung chung, kh\u00f4ng ph\u1ea3i t\u1ea1m th\u1eddi hay ph\u00e0n n\u00e0n, do \u0111\u00f3 ta d\u00f9ng hi\u1ec7n t\u1ea1i \u0111\u01a1n cho c\u1ea3 hai: <b>don't go / always try</b>."}, {"id": 9, "type": "multiple_choice", "questionHTML": "No, the train <b>does stop / is stopping</b> at Cirencester on Saturdays.", "options": [{"label": "A", "html": "does stop", "isCorrect": true}, {"label": "B", "html": "is stopping", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Kh\u00f4ng, t\u00e0u c\u00f3 d\u1eebng \u1edf Cirencester v\u00e0o c\u00e1c ng\u00e0y th\u1ee9 B\u1ea3y.<br>Gi\u1ea3i th\u00edch: 'on Saturdays' ch\u1ec9 l\u1ecbch tr\u00ecnh l\u1eb7p l\u1ea1i c\u1ed1 \u0111\u1ecbnh. D\u00f9ng th\u00ec hi\u1ec7n t\u1ea1i \u0111\u01a1n. \u1ede \u0111\u00e2y 'does stop' \u0111\u01b0\u1ee3c d\u00f9ng \u0111\u1ec3 nh\u1ea5n m\u1ea1nh kh\u1eb3ng \u0111\u1ecbnh (d\u00f9ng tr\u1ee3 \u0111\u1ed9ng t\u1eeb do/does + V). <b>does stop</b> \u0111\u00fang."}, {"id": 10, "type": "multiple_choice", "questionHTML": "My mum <b>takes / is taking</b> part in ice-skating competitions almost every weekend.", "options": [{"label": "A", "html": "takes", "isCorrect": true}, {"label": "B", "html": "is taking", "isCorrect": false}], "explanationHTML": "D\u1ecbch: M\u1eb9 t\u00f4i tham gia v\u00e0o c\u00e1c cu\u1ed9c thi tr\u01b0\u1ee3t b\u0103ng g\u1ea7n nh\u01b0 m\u1ed7i cu\u1ed1i tu\u1ea7n.<br>Gi\u1ea3i th\u00edch: 'almost every weekend' ch\u1ec9 m\u1ed9t th\u00f3i quen. D\u00f9ng hi\u1ec7n t\u1ea1i \u0111\u01a1n: <b>takes</b>."}, {"id": 11, "type": "gap_fill_text", "questionHTML": "<b>Rewrite correctly. Change the words or phrases in bold.</b><br>My dad <b>is often getting up</b> late on Saturday mornings.<br>My dad {{blank:b1}} late on Saturday mornings.", "blanks": [{"blankId": "b1", "correctAnswers": ["often gets up", "gets up often"]}], "explanationHTML": "D\u1ecbch: B\u1ed1 t\u00f4i th\u01b0\u1eddng xuy\u00ean d\u1eady mu\u1ed9n v\u00e0o c\u00e1c bu\u1ed5i s\u00e1ng th\u1ee9 B\u1ea3y.<br>Gi\u1ea3i th\u00edch: 'often' v\u00e0 'on Saturday mornings' ch\u1ec9 th\u00f3i quen, c\u1ea7n d\u00f9ng hi\u1ec7n t\u1ea1i \u0111\u01a1n, kh\u00f4ng d\u00f9ng hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n. Do \u0111\u00f3 'is often getting up' s\u1eeda th\u00e0nh <b>often gets up</b>."}, {"id": 12, "type": "gap_fill_text", "questionHTML": "<b>Are you speaking</b> any other languages apart from English?<br>{{blank:b1}} any other languages apart from English?", "blanks": [{"blankId": "b1", "correctAnswers": ["Do you speak", "do you speak"]}], "explanationHTML": "D\u1ecbch: B\u1ea1n c\u00f3 n\u00f3i ng\u00f4n ng\u1eef n\u00e0o kh\u00e1c ngo\u00e0i ti\u1ebfng Anh kh\u00f4ng?<br>Gi\u1ea3i th\u00edch: H\u1ecfi v\u1ec1 kh\u1ea3 n\u0103ng ng\u00f4n ng\u1eef chung chung, l\u00e0 s\u1ef1 th\u1eadt hi\u1ec3n nhi\u00ean (state), ta d\u00f9ng hi\u1ec7n t\u1ea1i \u0111\u01a1n: <b>Do you speak</b>."}, {"id": 13, "type": "gap_fill_text", "questionHTML": "<b>I already buy</b> all my Christmas presents and it's only October!<br>{{blank:b1}} all my Christmas presents and it's only October!", "blanks": [{"blankId": "b1", "correctAnswers": ["I have already bought", "I've already bought", "I have bought", "I've bought"]}], "explanationHTML": "D\u1ecbch: T\u00f4i \u0111\u00e3 mua xong t\u1ea5t c\u1ea3 qu\u00e0 Gi\u00e1ng sinh v\u00e0 gi\u1edd m\u1edbi ch\u1ec9 l\u00e0 th\u00e1ng 10!<br>Gi\u1ea3i th\u00edch: 'already' (\u0111\u00e3 ... r\u1ed3i) nh\u1ea5n m\u1ea1nh m\u1ed9t h\u00e0nh \u0111\u1ed9ng \u0111\u00e3 ho\u00e0n th\u00e0nh t\u00ednh \u0111\u1ebfn th\u1eddi \u0111i\u1ec3m hi\u1ec7n t\u1ea1i. Ta d\u00f9ng hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>I have already bought</b> ho\u1eb7c <b>I've already bought</b>."}, {"id": 14, "type": "gap_fill_text", "questionHTML": "It's the first time <b>I'm ever having</b> a party at home.<br>It's the first time {{blank:b1}} a party at home.", "blanks": [{"blankId": "b1", "correctAnswers": ["I have ever had", "I've ever had", "I have had"]}], "explanationHTML": "D\u1ecbch: \u0110\u00e2y l\u00e0 l\u1ea7n \u0111\u1ea7u ti\u00ean t\u00f4i t\u1eebng t\u1ed5 ch\u1ee9c m\u1ed9t b\u1eefa ti\u1ec7c \u1edf nh\u00e0.<br>Gi\u1ea3i th\u00edch: C\u1ea5u tr\u00fac 'It is the first time + S + have/has + V3/ed' (hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh). S\u1eeda th\u00e0nh: <b>I have ever had</b> ho\u1eb7c <b>I've ever had</b>."}, {"id": 15, "type": "gap_fill_text", "questionHTML": "Actually, I think Darren <b>does works</b> quite hard sometimes.<br>Actually, I think Darren {{blank:b1}} quite hard sometimes.", "blanks": [{"blankId": "b1", "correctAnswers": ["does work", "works"]}], "explanationHTML": "D\u1ecbch: Th\u1ef1c ra, t\u00f4i ngh\u0129 thi tho\u1ea3ng Darren l\u00e0m vi\u1ec7c kh\u00e1 ch\u0103m ch\u1ec9.<br>Gi\u1ea3i th\u00edch: N\u1ebfu d\u00f9ng 'does' \u0111\u1ec3 nh\u1ea5n m\u1ea1nh \u0111\u1ed9ng t\u1eeb \u1edf hi\u1ec7n t\u1ea1i \u0111\u01a1n th\u00ec \u0111\u1ed9ng t\u1eeb ch\u00ednh ph\u1ea3i gi\u1eef nguy\u00ean th\u1ec3: 'does work'. Ho\u1eb7c b\u1ecf 'does' th\u00e0nh 'works'."}, {"id": 16, "type": "gap_fill_text", "questionHTML": "Carlo <b>is never eating</b> Chinese food before.<br>Carlo {{blank:b1}} Chinese food before.", "blanks": [{"blankId": "b1", "correctAnswers": ["has never eaten", "hasn't ever eaten"]}], "explanationHTML": "D\u1ecbch: Carlo ch\u01b0a bao gi\u1edd \u0103n \u0111\u1ed3 \u0103n Trung Qu\u1ed1c tr\u01b0\u1edbc \u0111\u00e2y.<br>Gi\u1ea3i th\u00edch: 'before' v\u00e0 'never' m\u00f4 t\u1ea3 m\u1ed9t kinh nghi\u1ec7m t\u00ednh t\u1eeb tr\u01b0\u1edbc \u0111\u1ebfn nay. Ta d\u00f9ng hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>has never eaten</b>."}, {"id": 17, "type": "gap_fill_text", "questionHTML": "Sean <b>already books</b> a table for tonight.<br>Sean {{blank:b1}} a table for tonight.", "blanks": [{"blankId": "b1", "correctAnswers": ["has already booked", "has booked", "'s already booked"]}], "explanationHTML": "D\u1ecbch: Sean \u0111\u00e3 \u0111\u1eb7t b\u00e0n cho t\u1ed1i nay r\u1ed3i.<br>Gi\u1ea3i th\u00edch: 'already' \u0111i k\u00e8m v\u1edbi h\u00e0nh \u0111\u1ed9ng ho\u00e0n t\u1ea5t c\u00f3 k\u1ebft qu\u1ea3 \u1edf hi\u1ec7n t\u1ea1i. D\u00f9ng hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>has already booked</b>."}, {"id": 18, "type": "gap_fill_text", "questionHTML": "<b>Needs Melanie</b> any help painting her new flat?<br>{{blank:b1}} any help painting her new flat?", "blanks": [{"blankId": "b1", "correctAnswers": ["Does Melanie need", "does Melanie need"]}], "explanationHTML": "D\u1ecbch: Melanie c\u00f3 c\u1ea7n gi\u00fap s\u01a1n c\u0103n h\u1ed9 m\u1edbi c\u1ee7a c\u00f4 \u1ea5y kh\u00f4ng?<br>Gi\u1ea3i th\u00edch: 'Need' th\u01b0\u1eddng l\u00e0 \u0111\u1ed9ng t\u1eeb th\u01b0\u1eddng ch\u1ec9 tr\u1ea1ng th\u00e1i, kh\u00f4ng ti\u1ebfp di\u1ec5n. C\u00e2u h\u1ecfi \u1edf hi\u1ec7n t\u1ea1i \u0111\u01a1n ph\u1ea3i m\u01b0\u1ee3n tr\u1ee3 \u0111\u1ed9ng t\u1eeb 'Does': <b>Does Melanie need</b>."}, {"id": 19, "type": "gap_fill_text", "questionHTML": "<b>Complete using the correct form of the verb in brackets.</b><br>1 It's the first time {{blank:b1}} (I / ever / eat) octopus!", "blanks": [{"blankId": "b1", "correctAnswers": ["I have ever eaten", "I've ever eaten"]}], "explanationHTML": "D\u1ecbch: \u0110\u00e2y l\u00e0 l\u1ea7n \u0111\u1ea7u ti\u00ean t\u00f4i \u0103n b\u1ea1ch tu\u1ed9c!<br>Gi\u1ea3i th\u00edch: C\u1ea5u tr\u00fac 'It is the first time + Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh'. \u0110\u00e1p \u00e1n: <b>I have ever eaten</b>."}, {"id": 20, "type": "gap_fill_text", "questionHTML": "2 Sandy {{blank:b1}} (not / see) his sister since she went to university.", "blanks": [{"blankId": "b1", "correctAnswers": ["has not seen", "hasn't seen"]}], "explanationHTML": "D\u1ecbch: Sandy \u0111\u00e3 kh\u00f4ng g\u1eb7p em g\u00e1i k\u1ec3 t\u1eeb khi c\u00f4 \u1ea5y v\u00e0o \u0111\u1ea1i h\u1ecdc.<br>Gi\u1ea3i th\u00edch: 'since' + m\u1ed1c th\u1eddi gian trong qu\u00e1 kh\u1ee9 l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh. \u0110\u00e1p \u00e1n: <b>has not seen / hasn't seen</b>."}, {"id": 21, "type": "gap_fill_text", "questionHTML": "3 They {{blank:b1}} (go) on holiday to Spain and won't be back until the end of the month.", "blanks": [{"blankId": "b1", "correctAnswers": ["have gone", "'ve gone"]}], "explanationHTML": "D\u1ecbch: H\u1ecd \u0111\u00e3 \u0111i ngh\u1ec9 m\u00e1t \u1edf T\u00e2y Ban Nha v\u00e0 s\u1ebd kh\u00f4ng tr\u1edf v\u1ec1 cho \u0111\u1ebfn cu\u1ed1i th\u00e1ng.<br>Gi\u1ea3i th\u00edch: H\u00e0nh \u0111\u1ed9ng \u0111i \u0111\u1ebfn m\u1ed9t n\u01a1i v\u00e0 ch\u01b0a tr\u1edf v\u1ec1 ('won't be back...'), ta d\u00f9ng 'have/has gone'. \u0110\u00e1p \u00e1n: <b>have gone</b>."}, {"id": 22, "type": "gap_fill_text", "questionHTML": "4 Poor Tracy! She {{blank:b1}} (write) that essay for hours now and she still hasn't finished!", "blanks": [{"blankId": "b1", "correctAnswers": ["has been writing", "'s been writing"]}], "explanationHTML": "D\u1ecbch: T\u1ed9i nghi\u1ec7p Tracy! C\u00f4 \u1ea5y \u0111\u00e3 vi\u1ebft b\u00e0i lu\u1eadn \u0111\u00f3 h\u00e0ng gi\u1edd r\u1ed3i v\u00e0 c\u00f4 \u1ea5y v\u1eabn ch\u01b0a ho\u00e0n th\u00e0nh!<br>Gi\u1ea3i th\u00edch: H\u00e0nh \u0111\u1ed9ng b\u1eaft \u0111\u1ea7u trong qu\u00e1 kh\u1ee9, k\u00e9o d\u00e0i li\u00ean t\u1ee5c \u0111\u1ebfn hi\u1ec7n t\u1ea1i (for hours now), nh\u1ea5n m\u1ea1nh qu\u00e1 tr\u00ecnh li\u00ean t\u1ee5c. D\u00f9ng Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh ti\u1ebfp di\u1ec5n: <b>has been writing</b>."}, {"id": 23, "type": "gap_fill_text", "questionHTML": "5 {{blank:b1}} (you / ever / meet) anyone famous?", "blanks": [{"blankId": "b1", "correctAnswers": ["Have you ever met"]}], "explanationHTML": "D\u1ecbch: B\u1ea1n \u0111\u00e3 t\u1eebng g\u1eb7p ai n\u1ed5i ti\u1ebfng ch\u01b0a?<br>Gi\u1ea3i th\u00edch: C\u00e2u h\u1ecfi v\u1ec1 tr\u1ea3i nghi\u1ec7m t\u00ednh \u0111\u1ebfn hi\u1ec7n t\u1ea1i v\u1edbi 'ever'. D\u00f9ng Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>Have you ever met</b>."}, {"id": 24, "type": "gap_fill_text", "questionHTML": "6 {{blank:b1}} (I / try) to get in touch with Jenny all morning but I can't find her anywhere.", "blanks": [{"blankId": "b1", "correctAnswers": ["I have been trying", "I've been trying"]}], "explanationHTML": "D\u1ecbch: T\u00f4i \u0111\u00e3 c\u1ed1 g\u1eafng li\u00ean l\u1ea1c v\u1edbi Jenny c\u1ea3 bu\u1ed5i s\u00e1ng nh\u01b0ng t\u00f4i kh\u00f4ng th\u1ec3 t\u00ecm th\u1ea5y c\u00f4 \u1ea5y \u1edf \u0111\u00e2u.<br>Gi\u1ea3i th\u00edch: 'all morning' di\u1ec5n t\u1ea3 m\u1ed9t h\u00e0nh \u0111\u1ed9ng k\u00e9o d\u00e0i li\u00ean t\u1ee5c \u0111\u1ebfn hi\u1ec7n t\u1ea1i. D\u00f9ng Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh ti\u1ebfp di\u1ec5n: <b>I have been trying</b>."}, {"id": 25, "type": "gap_fill_text", "questionHTML": "7 {{blank:b1}} (I / not finish) the book yet so I can't tell you what happens.", "blanks": [{"blankId": "b1", "correctAnswers": ["I have not finished", "I haven't finished", "I've not finished"]}], "explanationHTML": "D\u1ecbch: T\u00f4i v\u1eabn ch\u01b0a \u0111\u1ecdc xong cu\u1ed1n s\u00e1ch n\u00ean t\u00f4i kh\u00f4ng th\u1ec3 k\u1ec3 cho b\u1ea1n nghe chuy\u1ec7n g\u00ec x\u1ea3y ra.<br>Gi\u1ea3i th\u00edch: 'yet' th\u01b0\u1eddng d\u00f9ng trong c\u00e2u ph\u1ee7 \u0111\u1ecbnh th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh, ch\u1ec9 vi\u1ec7c ch\u01b0a ho\u00e0n t\u1ea5t t\u00ednh t\u1edbi hi\u1ec7n t\u1ea1i. \u0110\u00e1p \u00e1n: <b>I have not finished / haven't finished</b>."}, {"id": 26, "type": "gap_fill_text", "questionHTML": "8 {{blank:b1}} (you / already / decide) where you're going this summer?", "blanks": [{"blankId": "b1", "correctAnswers": ["Have you already decided"]}], "explanationHTML": "D\u1ecbch: B\u1ea1n \u0111\u00e3 quy\u1ebft \u0111\u1ecbnh s\u1ebd \u0111i \u0111\u00e2u h\u00e8 n\u00e0y ch\u01b0a?<br>Gi\u1ea3i th\u00edch: H\u1ecfi v\u1ec1 m\u1ed9t h\u00e0nh \u0111\u1ed9ng \u0111\u00e3 ho\u00e0n t\u1ea5t tr\u01b0\u1edbc th\u1eddi \u0111i\u1ec3m hi\u1ec7n t\u1ea1i, c\u00f3 d\u00f9ng 'already'. D\u00f9ng Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>Have you already decided</b>."}, {"id": 27, "type": "gap_fill_text", "questionHTML": "9 {{blank:b1}} (We / live) here for the last six years.", "blanks": [{"blankId": "b1", "correctAnswers": ["We have lived", "We have been living", "We've lived", "We've been living"]}], "explanationHTML": "D\u1ecbch: Ch\u00fang t\u00f4i \u0111\u00e3 s\u1ed1ng \u1edf \u0111\u00e2y trong 6 n\u0103m qua.<br>Gi\u1ea3i th\u00edch: 'for the last six years' l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh ho\u1eb7c hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh ti\u1ebfp di\u1ec5n (nh\u1ea5n m\u1ea1nh s\u1ef1 li\u00ean t\u1ee5c). \u0110\u1ed9ng t\u1eeb 'live' c\u00f3 th\u1ec3 d\u00f9ng c\u1ea3 2 th\u00ec. \u0110\u00e1p \u00e1n: <b>We have lived</b> ho\u1eb7c <b>We have been living</b>."}, {"id": 28, "type": "gap_fill_text", "questionHTML": "10 {{blank:b1}} (I / never / hear) such nonsense!", "blanks": [{"blankId": "b1", "correctAnswers": ["I have never heard", "I've never heard"]}], "explanationHTML": "D\u1ecbch: T\u00f4i ch\u01b0a bao gi\u1edd nghe chuy\u1ec7n v\u00f4 l\u00fd nh\u01b0 v\u1eady!<br>Gi\u1ea3i th\u00edch: 'never' di\u1ec5n t\u1ea3 m\u1ed9t vi\u1ec7c ch\u01b0a t\u1eebng tr\u1ea3i qua cho \u0111\u1ebfn nay. D\u00f9ng Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>I have never heard</b>."}, {"id": 29, "type": "gap_fill_text", "questionHTML": "<b>Complete using the words in the box:<br>already \u2022 before \u2022 ever \u2022 for \u2022 just \u2022 rarely \u2022 since \u2022 so \u2022 still \u2022 yet</b><br><br>1 Have you {{blank:b1}} dreamt of winning the lottery?", "blanks": [{"blankId": "b1", "correctAnswers": ["ever"]}], "explanationHTML": "D\u1ecbch: B\u1ea1n \u0111\u00e3 t\u1eebng m\u01a1 tr\u00fang s\u1ed1 ch\u01b0a?<br>Gi\u1ea3i th\u00edch: Trong c\u00e2u h\u1ecfi tr\u1ea3i nghi\u1ec7m, ta th\u01b0\u1eddng d\u00f9ng <b>ever</b> (\u0111\u00e3 t\u1eebng)."}, {"id": 30, "type": "gap_fill_text", "questionHTML": "2 I haven't worked out how to set the timer on the video {{blank:b1}} .", "blanks": [{"blankId": "b1", "correctAnswers": ["yet"]}], "explanationHTML": "D\u1ecbch: T\u00f4i v\u1eabn ch\u01b0a t\u00ecm ra c\u00e1ch c\u00e0i \u0111\u1eb7t h\u1eb9n gi\u1edd tr\u00ean video.<br>Gi\u1ea3i th\u00edch: Trong c\u00e2u ph\u1ee7 \u0111\u1ecbnh th\u00ec hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh, t\u1eeb \u0111\u1ee9ng \u1edf cu\u1ed1i c\u00e2u mang ngh\u0129a 'v\u1eabn ch\u01b0a' l\u00e0 <b>yet</b>."}, {"id": 31, "type": "gap_fill_text", "questionHTML": "3 My dad's lived in the same house {{blank:b1}} he was born.", "blanks": [{"blankId": "b1", "correctAnswers": ["since"]}], "explanationHTML": "D\u1ecbch: B\u1ed1 t\u00f4i \u0111\u00e3 s\u1ed1ng trong c\u00f9ng m\u1ed9t ng\u00f4i nh\u00e0 k\u1ec3 t\u1eeb khi \u00f4ng \u1ea5y sinh ra.<br>Gi\u1ea3i th\u00edch: 'he was born' l\u00e0 m\u1ed9t m\u1ed1c th\u1eddi gian trong qu\u00e1 kh\u1ee9. \u0110\u1ee9ng tr\u01b0\u1edbc m\u1ed1c th\u1eddi gian \u0111i k\u00e8m v\u1edbi th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh l\u00e0 <b>since</b>."}, {"id": 32, "type": "gap_fill_text", "questionHTML": "4 The film's only been on {{blank:b1}} a couple of minutes.", "blanks": [{"blankId": "b1", "correctAnswers": ["for"]}], "explanationHTML": "D\u1ecbch: B\u1ed9 phim m\u1edbi ch\u1ec9 chi\u1ebfu \u0111\u01b0\u1ee3c v\u00e0i ph\u00fat.<br>Gi\u1ea3i th\u00edch: 'a couple of minutes' l\u00e0 m\u1ed9t kho\u1ea3ng th\u1eddi gian. D\u00f9ng <b>for</b> + kho\u1ea3ng th\u1eddi gian."}, {"id": 33, "type": "gap_fill_text", "questionHTML": "5 Bruce has knocked three men out of the competition {{blank:b1}} far.", "blanks": [{"blankId": "b1", "correctAnswers": ["so"]}], "explanationHTML": "D\u1ecbch: Bruce \u0111\u00e3 lo\u1ea1i 3 ng\u01b0\u1eddi ra kh\u1ecfi cu\u1ed9c thi cho \u0111\u1ebfn nay.<br>Gi\u1ea3i th\u00edch: C\u1ee5m t\u1eeb 'so far' mang ngh\u0129a l\u00e0 'cho \u0111\u1ebfn nay', d\u1ea5u hi\u1ec7u c\u1ee7a th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh. \u0110i\u1ec1n <b>so</b>."}, {"id": 34, "type": "gap_fill_text", "questionHTML": "6 I {{blank:b1}} get the chance to get any exercise - I'm just too busy.", "blanks": [{"blankId": "b1", "correctAnswers": ["rarely"]}], "explanationHTML": "D\u1ecbch: T\u00f4i hi\u1ebfm khi c\u00f3 c\u01a1 h\u1ed9i t\u1eadp th\u1ec3 d\u1ee5c - T\u00f4i qu\u00e1 b\u1eadn r\u1ed9n.<br>Gi\u1ea3i th\u00edch: Ng\u1eef c\u1ea3nh 'qu\u00e1 b\u1eadn' mang ngh\u0129a ti\u00eau c\u1ef1c, do \u0111\u00f3 tr\u1ea1ng t\u1eeb t\u1ea7n su\u1ea5t ph\u00f9 h\u1ee3p l\u00e0 <b>rarely</b> (hi\u1ebfm khi)."}, {"id": 35, "type": "gap_fill_text", "questionHTML": "7 He's only {{blank:b1}} got home.", "blanks": [{"blankId": "b1", "correctAnswers": ["just"]}], "explanationHTML": "D\u1ecbch: Anh \u1ea5y v\u1eeba m\u1edbi v\u1ec1 nh\u00e0.<br>Gi\u1ea3i th\u00edch: 'just' d\u00f9ng trong th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh \u0111\u1ec3 ch\u1ec9 m\u1ed9t h\u00e0nh \u0111\u1ed9ng v\u1eeba m\u1edbi x\u1ea3y ra. \u0110i\u1ec1n <b>just</b>."}, {"id": 36, "type": "gap_fill_text", "questionHTML": "8 It's eleven o'clock and Todd {{blank:b1}} hasn't come home. Where could he be?", "blanks": [{"blankId": "b1", "correctAnswers": ["still"]}], "explanationHTML": "D\u1ecbch: \u0110\u00e3 11 gi\u1edd r\u1ed3i m\u00e0 Todd v\u1eabn ch\u01b0a v\u1ec1 nh\u00e0. Anh \u1ea5y c\u00f3 th\u1ec3 \u1edf \u0111\u00e2u nh\u1ec9?<br>Gi\u1ea3i th\u00edch: 'still' \u0111\u01b0\u1ee3c d\u00f9ng trong c\u00e2u ph\u1ee7 \u0111\u1ecbnh tr\u01b0\u1edbc tr\u1ee3 \u0111\u1ed9ng t\u1eeb \u0111\u1ec3 nh\u1ea5n m\u1ea1nh s\u1ef1 b\u1ea5t ng\u1edd/s\u1ed1t ru\u1ed9t v\u1ec1 vi\u1ec7c g\u00ec \u0111\u00f3 ch\u01b0a x\u1ea3y ra. \u0110i\u1ec1n <b>still</b>."}, {"id": 37, "type": "gap_fill_text", "questionHTML": "9 I've never met Ruth {{blank:b1}} . What's she like?", "blanks": [{"blankId": "b1", "correctAnswers": ["before"]}], "explanationHTML": "D\u1ecbch: T\u00f4i ch\u01b0a bao gi\u1edd g\u1eb7p Ruth tr\u01b0\u1edbc \u0111\u00e2y. C\u00f4 \u1ea5y tr\u00f4ng nh\u01b0 th\u1ebf n\u00e0o?<br>Gi\u1ea3i th\u00edch: \u0110\u1ee9ng cu\u1ed1i c\u00e2u trong th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh di\u1ec5n t\u1ea3 vi\u1ec7c ch\u01b0a t\u1eebng x\u1ea3y ra tr\u01b0\u1edbc \u0111\u00f3 l\u00e0 <b>before</b>."}, {"id": 38, "type": "gap_fill_text", "questionHTML": "10 Have you finished {{blank:b1}} ? That was quick!", "blanks": [{"blankId": "b1", "correctAnswers": ["already"]}], "explanationHTML": "D\u1ecbch: B\u1ea1n \u0111\u00e3 ho\u00e0n th\u00e0nh r\u1ed3i sao? Th\u1eadt nhanh qu\u00e1!<br>Gi\u1ea3i th\u00edch: 'already' th\u01b0\u1eddng n\u1eb1m gi\u1eefa c\u00e2u nh\u01b0ng c\u0169ng c\u00f3 th\u1ec3 d\u00f9ng \u1edf cu\u1ed1i c\u00e2u h\u1ecfi \u0111\u1ec3 di\u1ec5n t\u1ea3 s\u1ef1 ng\u1ea1c nhi\u00ean v\u00ec ai \u0111\u00f3 l\u00e0m vi\u1ec7c g\u00ec \u0111\u00f3 xong s\u1edbm h\u01a1n d\u1ef1 ki\u1ebfn. \u0110i\u1ec1n <b>already</b>."}, {"id": 39, "type": "multiple_choice", "questionHTML": "<b>Choose the correct answer.</b><br>1 Ian ........... a shower at the moment, so could you call back in about half an hour?", "options": [{"label": "A", "html": "takes", "isCorrect": false}, {"label": "B", "html": "is taking", "isCorrect": true}, {"label": "C", "html": "has taken", "isCorrect": false}, {"label": "D", "html": "has been taking", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Ian \u0111ang t\u1eafm v\u00e0o l\u00fac n\u00e0y, n\u00ean b\u1ea1n c\u00f3 th\u1ec3 g\u1ecdi l\u1ea1i sau kho\u1ea3ng n\u1eeda ti\u1ebfng n\u1eefa kh\u00f4ng?<br>Gi\u1ea3i th\u00edch: 'at the moment' l\u00e0 d\u1ea5u hi\u1ec7u c\u1ee7a hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n, ch\u1ec9 h\u00e0nh \u0111\u1ed9ng \u0111ang di\u1ec5n ra l\u00fac n\u00f3i. \u0110\u00e1p \u00e1n \u0111\u00fang l\u00e0 <b>B. is taking</b>."}, {"id": 40, "type": "multiple_choice", "questionHTML": "2 ........... to Ipswich before?", "options": [{"label": "A", "html": "Do you ever go", "isCorrect": false}, {"label": "B", "html": "Are you ever going", "isCorrect": false}, {"label": "C", "html": "Have you ever been", "isCorrect": true}, {"label": "D", "html": "Have you ever been going", "isCorrect": false}], "explanationHTML": "D\u1ecbch: B\u1ea1n \u0111\u00e3 t\u1eebng \u0111\u1ebfn Ipswich tr\u01b0\u1edbc \u0111\u00e2y ch\u01b0a?<br>Gi\u1ea3i th\u00edch: H\u1ecfi v\u1ec1 tr\u1ea3i nghi\u1ec7m trong qu\u00e1 kh\u1ee9 kh\u00f4ng r\u00f5 th\u1eddi gian c\u1ee5 th\u1ec3 (ever, before), d\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh. \u0110\u00e1p \u00e1n <b>C. Have you ever been</b>."}, {"id": 41, "type": "multiple_choice", "questionHTML": "3 I ........... to all the local newspapers and TV stations to complain.", "options": [{"label": "A", "html": "already write", "isCorrect": false}, {"label": "B", "html": "already writing", "isCorrect": false}, {"label": "C", "html": "have already written", "isCorrect": true}, {"label": "D", "html": "have already been writing", "isCorrect": false}], "explanationHTML": "D\u1ecbch: T\u00f4i \u0111\u00e3 vi\u1ebft th\u01b0 khi\u1ebfu n\u1ea1i cho t\u1ea5t c\u1ea3 c\u00e1c t\u1edd b\u00e1o v\u00e0 \u0111\u00e0i truy\u1ec1n h\u00ecnh \u0111\u1ecba ph\u01b0\u01a1ng r\u1ed3i.<br>Gi\u1ea3i th\u00edch: 'already' nh\u1ea5n m\u1ea1nh h\u00e0nh \u0111\u1ed9ng \u0111\u00e3 x\u1ea3y ra v\u00e0 ho\u00e0n t\u1ea5t. D\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh: <b>C. have already written</b>."}, {"id": 42, "type": "multiple_choice", "questionHTML": "4 ........... TV for the last four hours? Turn it off and get some exercise!", "options": [{"label": "A", "html": "Do you watch", "isCorrect": false}, {"label": "B", "html": "Are you watching", "isCorrect": false}, {"label": "C", "html": "Watched you", "isCorrect": false}, {"label": "D", "html": "Have you been watching", "isCorrect": true}], "explanationHTML": "D\u1ecbch: C\u00f3 ph\u1ea3i b\u1ea1n \u0111\u00e3 xem TV su\u1ed1t 4 ti\u1ebfng qua kh\u00f4ng? T\u1eaft \u0111i v\u00e0 t\u1eadp th\u1ec3 d\u1ee5c ch\u00fat \u0111i!<br>Gi\u1ea3i th\u00edch: H\u00e0nh \u0111\u1ed9ng b\u1eaft \u0111\u1ea7u trong qu\u00e1 kh\u1ee9 k\u00e9o d\u00e0i li\u00ean t\u1ee5c t\u1edbi hi\u1ec7n t\u1ea1i ('for the last four hours') g\u00e2y ra s\u1ef1 b\u1ef1c m\u00ecnh, d\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh ti\u1ebfp di\u1ec5n. \u0110\u00e1p \u00e1n <b>D. Have you been watching</b>."}, {"id": 43, "type": "multiple_choice", "questionHTML": "5 Eric, ........... hockey competitively or just for fun?", "options": [{"label": "A", "html": "do you usually play", "isCorrect": true}, {"label": "B", "html": "are you usually playing", "isCorrect": false}, {"label": "C", "html": "have you usually played", "isCorrect": false}, {"label": "D", "html": "have you usually been playing", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Eric, b\u1ea1n th\u01b0\u1eddng ch\u01a1i kh\u00fac c\u00f4n c\u1ea7u \u0111\u1ec3 thi \u0111\u1ea5u hay ch\u1ec9 cho vui?<br>Gi\u1ea3i th\u00edch: H\u1ecfi v\u1ec1 m\u1ed9t th\u00f3i quen chung, s\u1edf th\u00edch, c\u00f3 tr\u1ea1ng t\u1eeb 'usually'. D\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i \u0111\u01a1n: <b>A. do you usually play</b>."}, {"id": 44, "type": "multiple_choice", "questionHTML": "6 That's the first time ........... an answer right today!", "options": [{"label": "A", "html": "I get", "isCorrect": false}, {"label": "B", "html": "I am getting", "isCorrect": false}, {"label": "C", "html": "I have got", "isCorrect": true}, {"label": "D", "html": "I have been getting", "isCorrect": false}], "explanationHTML": "D\u1ecbch: \u0110\u00f3 l\u00e0 l\u1ea7n \u0111\u1ea7u ti\u00ean t\u00f4i c\u00f3 m\u1ed9t c\u00e2u tr\u1ea3 l\u1eddi \u0111\u00fang trong ng\u00e0y h\u00f4m nay!<br>Gi\u1ea3i th\u00edch: C\u1ea5u tr\u00fac 'That is the first time / It's the first time...' lu\u00f4n \u0111i v\u1edbi th\u00ec Hi\u1ec7n t\u1ea1i ho\u00e0n th\u00e0nh. \u0110\u00e1p \u00e1n <b>C. I have got</b>."}, {"id": 45, "type": "multiple_choice", "questionHTML": "7 Jessica has ........... left, I'm afraid.", "options": [{"label": "A", "html": "already", "isCorrect": true}, {"label": "B", "html": "yet", "isCorrect": false}, {"label": "C", "html": "still", "isCorrect": false}, {"label": "D", "html": "so far", "isCorrect": false}], "explanationHTML": "D\u1ecbch: T\u00f4i e l\u00e0 Jessica \u0111\u00e3 r\u1eddi \u0111i r\u1ed3i.<br>Gi\u1ea3i th\u00edch: C\u1ea7n m\u1ed9t tr\u1ea1ng t\u1eeb \u0111\u1ee9ng gi\u1eefa 'has' v\u00e0 PII 'left' ch\u1ec9 vi\u1ec7c \u0111\u00e3 x\u1ea3y ra r\u1ed3i. \u0110\u00e1p \u00e1n \u0111\u00fang l\u00e0 <b>A. already</b>."}, {"id": 46, "type": "multiple_choice", "questionHTML": "8 Dan ........... in the living room while we redecorate his bedroom.", "options": [{"label": "A", "html": "sleeps", "isCorrect": false}, {"label": "B", "html": "is sleeping", "isCorrect": true}, {"label": "C", "html": "has slept", "isCorrect": false}, {"label": "D", "html": "does sleep", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Dan \u0111ang ng\u1ee7 t\u1ea1m trong ph\u00f2ng kh\u00e1ch trong khi ch\u00fang t\u00f4i trang tr\u00ed l\u1ea1i ph\u00f2ng ng\u1ee7 c\u1ee7a c\u1eadu \u1ea5y.<br>Gi\u1ea3i th\u00edch: Vi\u1ec7c 'ng\u1ee7 trong ph\u00f2ng kh\u00e1ch' l\u00e0 m\u1ed9t t\u00ecnh hu\u1ed1ng t\u1ea1m th\u1eddi (temporary situation) di\u1ec5n ra trong l\u00fac \u0111ang trang tr\u00ed l\u1ea1i ph\u00f2ng. D\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i ti\u1ebfp di\u1ec5n: <b>B. is sleeping</b>."}, {"id": 47, "type": "multiple_choice", "questionHTML": "9 Unfortunately, Simone ........... a day off very often.", "options": [{"label": "A", "html": "doesn't get", "isCorrect": true}, {"label": "B", "html": "isn't getting", "isCorrect": false}, {"label": "C", "html": "hasn't got", "isCorrect": false}, {"label": "D", "html": "hasn't been getting", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Th\u1eadt kh\u00f4ng may, Simone kh\u00f4ng \u0111\u01b0\u1ee3c ngh\u1ec9 th\u01b0\u1eddng xuy\u00ean.<br>Gi\u1ea3i th\u00edch: 'very often' ch\u1ec9 m\u1ed9t s\u1ef1 th\u01b0\u1eddng xuy\u00ean, l\u1eb7p l\u1ea1i. D\u00f9ng th\u00ec Hi\u1ec7n t\u1ea1i \u0111\u01a1n: <b>A. doesn't get</b>."}, {"id": 48, "type": "multiple_choice", "questionHTML": "10 Actually, I ........... a cup of tea first thing every morning but then I switch to coffee.", "options": [{"label": "A", "html": "do drink", "isCorrect": true}, {"label": "B", "html": "am drinking", "isCorrect": false}, {"label": "C", "html": "have drunk", "isCorrect": false}, {"label": "D", "html": "have been drinking", "isCorrect": false}], "explanationHTML": "D\u1ecbch: Th\u1ef1c ra, t\u00f4i u\u1ed1ng m\u1ed9t t\u00e1ch tr\u00e0 ngay vi\u1ec7c \u0111\u1ea7u ti\u00ean m\u1ed7i s\u00e1ng nh\u01b0ng sau \u0111\u00f3 t\u00f4i chuy\u1ec3n sang u\u1ed1ng c\u00e0 ph\u00ea.<br>Gi\u1ea3i th\u00edch: 'every morning' ch\u1ec9 th\u00f3i quen, d\u00f9ng Hi\u1ec7n t\u1ea1i \u0111\u01a1n. 'do drink' d\u00f9ng \u0111\u1ec3 nh\u1ea5n m\u1ea1nh s\u1ef1 kh\u1eb3ng \u0111\u1ecbnh. C\u00e1c \u0111\u00e1p \u00e1n kh\u00e1c sai th\u00ec. \u0110\u00e1p \u00e1n <b>A. do drink</b>."}];
-        let userState = {};
-        let studentName = "";
+        const testName = "Unit 1 (Sections A-E)";
+
+        const state = {};
+        let studentName = '';
         
-        // Audio Context Setup
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+        function init() {
+            const container = document.getElementById('questionsContainer');
+            quizData.forEach(q => {
+                state[q.id] = { checked: false, isCorrect: false };
+                
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                block.id = 'q-block-' + q.id;
+                
+                let qText = q.questionHTML || q.question;
+                
+                if (q.type === 'gap_fill_text') {
+                    q.blanks.forEach(b => {
+                        let blankStr = '{{blank:' + b.blankId + '}}';
+                        let inpStr = '<input type="text" id="input-' + q.id + '-' + b.blankId + '" class="gap-fill-input" autocomplete="off">';
+                        qText = qText.replace(blankStr, inpStr);
+                    });
+                }
+                
+                let html = '<div class="question-text">' + qText + '</div>';
+                
+                if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                    html += '<div class="options">';
+                    q.options.forEach(opt => {
+                        html += '<label id="lbl-' + q.id + '-' + opt.label + '"><input type="radio" name="q-' + q.id + '" value="' + opt.label + '"> <b>' + opt.label + '.</b> ' + opt.text.replace(/^[A-D]\.\s*/, '') + '</label>';
+                    });
+                    html += '</div>';
+                } 
+                else if (q.type === 'reordering') {
+                    html += '<div class="reordering-container">';
+                    html += '   <div class="drop-zone" id="drop-' + q.id + '"></div>';
+                    html += '   <div class="word-bank" id="bank-' + q.id + '">';
+                    q.words.forEach(w => {
+                        html += '<span class="word-chip" id="chip-' + q.id + '-' + w.tokenId + '" data-token="' + w.tokenId + '" onclick="moveChip(' + q.id + ', \'' + w.tokenId + '\')">' + w.text + '</span>';
+                    });
+                    html += '</div></div>';
+                }
+                else if (q.type === 'sentence_rewrite') {
+                    html += '<textarea class="rewrite-input" id="input-' + q.id + '" placeholder="Nhập câu trả lời của bạn..."></textarea>';
+                }
+                
+                html += '<button class="check-btn" id="check-btn-' + q.id + '" onclick="checkQuestion(' + q.id + ')">Kiểm tra</button>';
+                html += '<div class="explanation" id="expl-' + q.id + '"></div>';
+                
+                block.innerHTML = html;
+                container.appendChild(block);
+            });
         }
         
-        function playSelectSound() {
-            try {
-                if(!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.08);
-            } catch(e){}
-        }
-        
-        function playCorrectSound() {
-            try {
-                if(!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.25);
-            } catch(e){}
-        }
-        
-        function playWrongSound() {
-            try {
-                if(!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-            } catch(e){}
-        }
-        
-        function playSubmitSound() {
-            try {
-                if(!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.12);
-            } catch(e){}
-        }
-        
-        function escapeHTML(str) {
-            const d = document.createElement('div');
-            d.textContent = str;
-            return d.innerHTML;
-        }
-        
-        function normalizeAnswer(str) {
-            return str.trim().replace(/\s+/g, ' ').toLowerCase();
-        }
-        
-        function startQuiz() {
-            const nameInput = document.getElementById('student-name');
-            studentName = nameInput.value.trim();
-            if (!studentName) {
-                alert("Vui lòng nhập tên trước khi làm bài!");
+        function startTest() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            if (!nameInput) {
+                alert('Vui lòng nhập họ và tên của bạn!');
                 return;
             }
-            initAudio();
-            document.getElementById('intro-screen').style.display = 'none';
-            document.getElementById('quiz-screen').style.display = 'block';
-            initData();
-            renderQuiz();
-            updateProgress();
+            studentName = nameInput;
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('testScreen').classList.add('active');
+            window.scrollTo(0, 0);
         }
         
-        function shuffleArray(array) {
-            let curId = array.length;
-            while (0 !== curId) {
-                let randId = Math.floor(Math.random() * curId);
-                curId -= 1;
-                let tmp = array[curId];
-                array[curId] = array[randId];
-                array[randId] = tmp;
+        function moveChip(qid, tokenId) {
+            if (state[qid].checked) return;
+            const chip = document.getElementById('chip-' + qid + '-' + tokenId);
+            const bank = document.getElementById('bank-' + qid);
+            const drop = document.getElementById('drop-' + qid);
+            if (chip.parentElement === bank) {
+                drop.appendChild(chip);
+            } else {
+                bank.appendChild(chip);
             }
-            return array;
-        }
-        
-        function initData() {
-            quizData.forEach(q => {
-                if (q.type === 'multiple_choice') {
-                    userState[q.id] = { answer: null, checked: false, isCorrect: null, blankResults: null };
-                    let labels = ['A','B','C','D'];
-                    let shuffled = shuffleArray([...q.options]);
-                    q.renderOptions = shuffled.map((opt, i) => {
-                        return { originalLabel: opt.label, displayLabel: labels[i], html: opt.html, isCorrect: opt.isCorrect };
-                    });
-                } else if (q.type === 'gap_fill_text') {
-                    let ans = {};
-                    q.blanks.forEach(b => { ans[b.blankId] = null; });
-                    userState[q.id] = { answer: ans, checked: false, isCorrect: null, blankResults: {} };
-                }
-            });
-        }
-        
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = '';
-            
-            quizData.forEach((q, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.id = 'card-' + q.id;
-                
-                let qHtml = q.questionHTML;
-                
-                let bodyHtml = '';
-                if (q.type === 'multiple_choice') {
-                    bodyHtml = '<div class="options-list">';
-                    q.renderOptions.forEach(opt => {
-                        bodyHtml += `<div class="option-item" id="opt-${q.id}-${opt.originalLabel}" onclick="selectOption(${q.id}, '${opt.originalLabel}')">
-                            <span class="option-label">${opt.displayLabel}.</span> <span>${opt.html}</span>
-                        </div>`;
-                    });
-                    bodyHtml += '</div>';
-                } else if (q.type === 'gap_fill_text') {
-                    q.blanks.forEach(b => {
-                        const inputHtml = `<input type="text" class="gap-input" id="input-${q.id}-${b.blankId}" data-qid="${q.id}" data-bid="${b.blankId}" autocomplete="off">`;
-                        qHtml = qHtml.replace('{{blank:' + b.blankId + '}}', inputHtml);
-                    });
-                }
-                
-                card.innerHTML = `
-                    <div class="question-text">Câu ${index + 1}: ${qHtml}</div>
-                    ${bodyHtml}
-                    <button class="btn-check" id="check-btn-${q.id}" onclick="checkQuestion(${q.id})" disabled>Kiểm tra</button>
-                    <div class="explanation" id="expl-${q.id}">${q.explanationHTML}</div>
-                `;
-                container.appendChild(card);
-            });
-            
-            document.querySelectorAll('.gap-input').forEach(input => {
-                input.addEventListener('input', function() {
-                    const qid = parseInt(this.getAttribute('data-qid'));
-                    const bid = this.getAttribute('data-bid');
-                    
-                    if (userState[qid].checked) return;
-                    
-                    userState[qid].answer[bid] = this.value;
-                    if (this.value.trim() !== "") {
-                        this.classList.add('pending');
-                    } else {
-                        this.classList.remove('pending');
-                    }
-                    
-                    checkEnableButton(qid);
-                    updateProgress();
-                });
-                
-                input.addEventListener('change', function() {
-                    if (!userState[parseInt(this.getAttribute('data-qid'))].checked && this.value.trim() !== "") {
-                        playSelectSound();
-                    }
-                });
-            });
-        }
-        
-        function selectOption(qid, originalLabel) {
-            if (userState[qid].checked) return;
-            initAudio();
-            playSelectSound();
-            
-            userState[qid].answer = originalLabel;
-            
-            const card = document.getElementById('card-' + qid);
-            card.querySelectorAll('.option-item').forEach(el => el.classList.remove('pending'));
-            card.querySelector('#opt-' + qid + '-' + originalLabel).classList.add('pending');
-            
-            checkEnableButton(qid);
-            updateProgress();
-        }
-        
-        function checkEnableButton(qid) {
-            const state = userState[qid];
-            const q = quizData.find(x => x.id === qid);
-            const btn = document.getElementById('check-btn-' + qid);
-            
-            let hasAction = false;
-            if (q.type === 'multiple_choice') {
-                hasAction = state.answer !== null;
-            } else if (q.type === 'gap_fill_text') {
-                for (let b in state.answer) {
-                    if (state.answer[b] !== null && state.answer[b].trim() !== "") {
-                        hasAction = true;
-                        break;
-                    }
-                }
-            }
-            btn.disabled = !hasAction;
-        }
-        
-        function updateProgress() {
-            let answered = 0;
-            quizData.forEach(q => {
-                const state = userState[q.id];
-                if (q.type === 'multiple_choice' && state.answer !== null) answered++;
-                else if (q.type === 'gap_fill_text') {
-                    let done = false;
-                    for (let b in state.answer) {
-                        if (state.answer[b] !== null && state.answer[b].trim() !== "") {
-                            done = true;
-                            break;
-                        }
-                    }
-                    if (done) answered++;
-                }
-            });
-            document.getElementById('progress-text').innerText = `${answered} / ${quizData.length}`;
-            document.getElementById('progress-fill').style.width = `${(answered/quizData.length)*100}%`;
         }
         
         function checkQuestion(qid) {
-            if (userState[qid].checked) return;
+            if (state[qid].checked) return;
             const q = quizData.find(x => x.id === qid);
-            const state = userState[qid];
             
-            let canCheck = false;
-            if (q.type === 'multiple_choice') {
-                canCheck = state.answer !== null;
+            // Validate answered
+            if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                const selected = document.querySelector('input[name="q-' + qid + '"]:checked');
+                if (!selected) { alert("Vui lòng chọn một đáp án!"); return; }
             } else if (q.type === 'gap_fill_text') {
-                canCheck = true;
-                for (let i=0; i<q.blanks.length; i++) {
-                    let bid = q.blanks[i].blankId;
-                    if (!state.answer[bid] || state.answer[bid].trim() === "") {
-                        canCheck = false;
-                        break;
-                    }
-                }
-            }
-            
-            if (!canCheck) {
-                alert("Vui lòng hoàn thành toàn bộ câu hỏi trước khi kiểm tra!");
-                return;
-            }
-            
-            state.checked = true;
-            const card = document.getElementById('card-' + qid);
-            const btn = document.getElementById('check-btn-' + qid);
-            btn.disabled = true;
-            
-            if (q.type === 'multiple_choice') {
-                const correctOpt = q.options.find(o => o.isCorrect).label;
-                state.isCorrect = (state.answer === correctOpt);
-                
-                card.querySelectorAll('.option-item').forEach(el => el.classList.remove('pending'));
-                
-                if (state.isCorrect) {
-                    card.querySelector('#opt-' + qid + '-' + correctOpt).classList.add('correct');
-                    playCorrectSound();
-                } else {
-                    card.querySelector('#opt-' + qid + '-' + state.answer).classList.add('wrong');
-                    card.querySelector('#opt-' + qid + '-' + correctOpt).classList.add('correct');
-                    playWrongSound();
-                }
-                card.querySelector('.options-list').classList.add('locked');
-                
-            } else if (q.type === 'gap_fill_text') {
-                let allCorrect = true;
+                let allFilled = true;
                 q.blanks.forEach(b => {
-                    const ans = state.answer[b.blankId];
-                    const inputEl = document.getElementById(`input-${qid}-${b.blankId}`);
-                    inputEl.classList.remove('pending');
-                    inputEl.classList.add('locked');
-                    inputEl.disabled = true;
+                    if (!document.getElementById('input-' + qid + '-' + b.blankId).value.trim()) allFilled = false;
+                });
+                if (!allFilled) { alert("Vui lòng điền vào tất cả chỗ trống!"); return; }
+            } else if (q.type === 'reordering') {
+                const bank = document.getElementById('bank-' + qid);
+                if (bank.children.length > 0) { alert("Vui lòng ghép tất cả các từ!"); return; }
+            } else if (q.type === 'sentence_rewrite') {
+                if (!document.getElementById('input-' + qid).value.trim()) { alert("Vui lòng nhập câu trả lời!"); return; }
+            }
+            
+            // Check logic
+            state[qid].checked = true;
+            document.getElementById('check-btn-' + qid).disabled = true;
+            const expl = document.getElementById('expl-' + qid);
+            expl.innerHTML = q.explanationHTML || q.explanation || '';
+            expl.style.display = 'block';
+            
+            let isCorrect = false;
+            let errorDetails = "";
+            
+            if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                const selectedVal = document.querySelector('input[name="q-' + qid + '"]:checked').value;
+                const correctOpt = q.options.find(o => o.isCorrect).label;
+                isCorrect = (selectedVal === correctOpt);
+                
+                document.querySelectorAll('input[name="q-' + qid + '"]').forEach(el => el.disabled = true);
+                
+                if (isCorrect) {
+                    document.getElementById('lbl-' + qid + '-' + selectedVal).classList.add('correct-opt');
+                } else {
+                    document.getElementById('lbl-' + qid + '-' + selectedVal).classList.add('wrong-opt');
+                    document.getElementById('lbl-' + qid + '-' + correctOpt).classList.add('correct-opt');
+                    errorDetails = 'Câu ' + qid + ': Học sinh chọn ' + selectedVal + ' (sai), đáp án đúng là ' + correctOpt;
+                }
+            } 
+            else if (q.type === 'gap_fill_text') {
+                let allCorrect = true;
+                let userAnswersArr = [];
+                let correctAnswersArr = [];
+                
+                q.blanks.forEach(b => {
+                    const input = document.getElementById('input-' + qid + '-' + b.blankId);
+                    const val = input.value.trim().toLowerCase();
+                    input.disabled = true;
+                    userAnswersArr.push(input.value.trim());
+                    correctAnswersArr.push(b.correctAnswers[0]);
                     
-                    let normAns = normalizeAnswer(ans);
-                    let isBlankCorrect = b.correctAnswers.some(ca => normalizeAnswer(ca) === normAns);
-                    state.blankResults[b.blankId] = isBlankCorrect;
-                    
-                    if (isBlankCorrect) {
-                        inputEl.classList.add('correct');
-                        inputEl.value = b.correctAnswers[0]; 
+                    const isMatch = b.correctAnswers.some(ans => ans.toLowerCase().trim() === val);
+                    if (isMatch) {
+                        input.classList.add('correct-input');
                     } else {
-                        inputEl.classList.add('wrong');
+                        input.classList.add('wrong-input');
                         allCorrect = false;
-                        let corrSpan = document.createElement('span');
-                        corrSpan.className = 'correct-answer-text';
-                        corrSpan.textContent = ' (' + b.correctAnswers[0] + ')';
-                        inputEl.parentNode.insertBefore(corrSpan, inputEl.nextSibling);
+                        let span = document.createElement('span');
+                        span.className = 'correct-answer-text';
+                        span.textContent = ' (' + b.correctAnswers[0] + ') ';
+                        input.parentNode.insertBefore(span, input.nextSibling);
                     }
                 });
-                state.isCorrect = allCorrect;
-                if (allCorrect) playCorrectSound();
-                else playWrongSound();
+                isCorrect = allCorrect;
+                if (!isCorrect) {
+                    errorDetails = 'Câu ' + qid + ': Học sinh điền "' + userAnswersArr.join(', ') + '" (sai), đáp án đúng là "' + correctAnswersArr.join(', ') + '"';
+                }
+            }
+            else if (q.type === 'reordering') {
+                const drop = document.getElementById('drop-' + qid);
+                const chips = Array.from(drop.children);
+                let userOrder = chips.map(c => c.getAttribute('data-token'));
+                isCorrect = JSON.stringify(userOrder) === JSON.stringify(q.correctOrder);
+                
+                let userText = chips.map(c => c.textContent).join(' ');
+                let corrText = q.correctOrder.map(tid => q.words.find(w => w.tokenId === tid).text).join(' ');
+                
+                if (isCorrect) {
+                    drop.classList.add('correct-opt');
+                } else {
+                    drop.classList.add('wrong-opt');
+                    let corrDiv = document.createElement('div');
+                    corrDiv.style.marginTop = '10px';
+                    corrDiv.style.color = '#e74c3c';
+                    corrDiv.style.fontWeight = 'bold';
+                    corrDiv.textContent = "Đáp án đúng: " + corrText;
+                    drop.parentNode.appendChild(corrDiv);
+                    errorDetails = 'Câu ' + qid + ': Học sinh ghép "' + userText + '" (sai), đáp án đúng là "' + corrText + '"';
+                }
+            }
+            else if (q.type === 'sentence_rewrite') {
+                const input = document.getElementById('input-' + qid);
+                input.disabled = true;
+                input.classList.add('wrong-opt'); 
+                let corrDiv = document.createElement('div');
+                corrDiv.style.marginTop = '10px';
+                corrDiv.style.color = '#27ae60';
+                corrDiv.style.fontWeight = 'bold';
+                corrDiv.textContent = "Đáp án mẫu: " + q.sampleAnswers.join(" HOẶC ");
+                input.parentNode.insertBefore(corrDiv, input.nextSibling);
+                isCorrect = true; 
+                state[qid].isRewrite = true;
             }
             
-            document.getElementById('expl-' + qid).style.display = 'block';
+            state[qid].isCorrect = isCorrect;
+            state[qid].errorDetails = errorDetails;
+            updateProgress();
         }
         
-        function submitQuiz() {
-            if (!studentName) {
-                alert("Vui lòng nhập tên học sinh!");
-                return;
-            }
-            
-            // Auto check remaining
+        function updateProgress() {
+            let checkedCount = 0;
+            quizData.forEach(q => { if (state[q.id].checked) checkedCount++; });
+            const pct = (checkedCount / quizData.length) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+        
+        function submitTest() {
             quizData.forEach(q => {
-                const state = userState[q.id];
-                if (!state.checked) {
-                    state.checked = true;
-                    if (q.type === 'multiple_choice') {
-                        state.isCorrect = false;
-                        const correctOpt = q.options.find(o => o.isCorrect).label;
-                        const card = document.getElementById('card-' + q.id);
-                        if(card) {
-                            card.querySelectorAll('.option-item').forEach(el => el.classList.remove('pending'));
-                            card.querySelector('#opt-' + q.id + '-' + correctOpt).classList.add('correct');
-                            card.querySelector('.options-list').classList.add('locked');
-                            document.getElementById('expl-' + q.id).style.display = 'block';
-                            document.getElementById('check-btn-' + q.id).disabled = true;
-                        }
-                    } else if (q.type === 'gap_fill_text') {
-                        state.isCorrect = false;
-                        q.blanks.forEach(b => {
-                            state.blankResults[b.blankId] = false;
-                            const inputEl = document.getElementById(`input-${q.id}-${b.blankId}`);
-                            if(inputEl) {
-                                inputEl.classList.remove('pending');
-                                inputEl.classList.add('locked');
-                                inputEl.disabled = true;
-                                if (!inputEl.value) inputEl.value = "";
-                                inputEl.classList.add('wrong');
-                                let corrSpan = document.createElement('span');
-                                corrSpan.className = 'correct-answer-text';
-                                corrSpan.textContent = ' (' + b.correctAnswers[0] + ')';
-                                inputEl.parentNode.insertBefore(corrSpan, inputEl.nextSibling);
-                            }
-                        });
-                        const card = document.getElementById('card-' + q.id);
-                        if(card) {
-                            document.getElementById('expl-' + q.id).style.display = 'block';
-                            document.getElementById('check-btn-' + q.id).disabled = true;
-                        }
-                    }
+                if (!state[q.id].checked) {
+                    state[q.id].checked = true;
+                    state[q.id].isCorrect = false;
+                    state[q.id].errorDetails = 'Câu ' + q.id + ': Bỏ trống';
                 }
             });
             
             updateProgress();
             
-            let correctCount = 0;
-            let gradableCount = quizData.length;
-            let errorDetails = [];
+            let score = 0;
+            let gradableCount = 0;
+            let errorList = [];
             
-            quizData.forEach((q, i) => {
-                const state = userState[q.id];
-                if (state.isCorrect) {
-                    correctCount++;
-                } else {
-                    let ansText = "Chưa làm";
-                    let corrText = "";
-                    if (q.type === 'multiple_choice') {
-                        if (state.answer) {
-                            let selected = q.options.find(o => o.label === state.answer);
-                            ansText = selected ? selected.html : state.answer;
-                        }
-                        corrText = q.options.find(o => o.isCorrect).html;
-                    } else if (q.type === 'gap_fill_text') {
-                        let ansArr = [];
-                        let corrArr = [];
-                        q.blanks.forEach(b => {
-                            ansArr.push(state.answer[b.blankId] || "(trống)");
-                            corrArr.push(b.correctAnswers[0]);
-                        });
-                        ansText = ansArr.join(" | ");
-                        corrText = corrArr.join(" | ");
-                    }
-                    errorDetails.push(`Câu ${i+1}: Học sinh chọn ${ansText} (sai), đáp án đúng là ${corrText}`);
-                }
+            quizData.forEach(q => {
+                if (state[q.id].isRewrite) return;
+                gradableCount++;
+                if (state[q.id].isCorrect) score++;
+                else if (state[q.id].errorDetails) errorList.push(state[q.id].errorDetails);
             });
             
-            let scoreStr = `${correctCount} / ${gradableCount}`;
+            const scoreText = score + ' / ' + gradableCount;
+            const errorDetailsStr = errorList.length > 0 ? errorList.join(' | ') : 'Không có lỗi sai';
+            const formURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse';
             
-            if (correctCount === gradableCount) {
-                playCorrectSound();
-            } else {
-                playSubmitSound();
-            }
-            
-            document.getElementById('btn-submit').disabled = true;
-            
-            document.getElementById('modal-title').innerText = `Điểm của bạn: ${scoreStr}`;
-            let per = correctCount / gradableCount;
-            let cmt = per >= 0.8 ? "Rất xuất sắc!" : per >= 0.5 ? "Làm tốt lắm, cố gắng hơn nhé!" : "Cần ôn tập thêm bạn nhé!";
-            document.getElementById('modal-desc').innerText = cmt;
-            document.getElementById('result-modal').style.display = 'flex';
-            
-            // Build Wrong list
-            const resultsSection = document.getElementById('results-section');
-            const wrongList = document.getElementById('wrong-list');
-            wrongList.innerHTML = '';
-            resultsSection.style.display = 'block';
-            
-            if (correctCount === gradableCount) {
-                wrongList.innerHTML = '<h3 style="color:var(--color-correct)">Chúc mừng! Bạn đã làm đúng 100% các câu hỏi!</h3>';
-            } else {
-                quizData.forEach((q, index) => {
-                    const state = userState[q.id];
-                    if (!state.isCorrect) {
-                        const div = document.createElement('div');
-                        div.className = 'card';
-                        let cHtml = `<div class="question-text">Câu ${index + 1}: ${q.questionHTML}</div>`;
-                        
-                        if (q.type === 'multiple_choice') {
-                            cHtml += '<div class="options-list">';
-                            q.renderOptions.forEach(opt => {
-                                let c = '';
-                                if (opt.originalLabel === state.answer) c = 'wrong';
-                                if (opt.isCorrect) c = 'correct';
-                                cHtml += `<div class="option-item ${c}">${opt.displayLabel}. ${opt.html}</div>`;
-                            });
-                            if (!state.answer) cHtml += '<div style="color:var(--color-wrong); margin-top:10px;">(Bạn chưa chọn đáp án)</div>';
-                            cHtml += '</div>';
-                        } else if (q.type === 'gap_fill_text') {
-                            cHtml = `<div class="question-text">Câu ${index + 1}: ${q.questionHTML}</div>`;
-                            q.blanks.forEach(b => {
-                                let ans = state.answer[b.blankId] || "";
-                                let isC = state.blankResults[b.blankId];
-                                let rep = '';
-                                if (isC) {
-                                    rep = `<span style="color:var(--color-correct); font-weight:bold;">${escapeHTML(ans)}</span>`;
-                                } else {
-                                    if (ans) {
-                                        rep = `<span style="color:var(--color-wrong); text-decoration:line-through;">${escapeHTML(ans)}</span> <span style="color:var(--color-correct); font-weight:bold;">(${b.correctAnswers[0]})</span>`;
-                                    } else {
-                                        rep = `<span style="color:var(--color-correct); font-weight:bold;">(${b.correctAnswers[0]})</span>`;
-                                    }
-                                }
-                                cHtml = cHtml.replace('{{blank:' + b.blankId + '}}', rep);
-                            });
-                        }
-                        
-                        cHtml += `<div class="explanation" style="display:block;">${q.explanationHTML}</div>`;
-                        div.innerHTML = cHtml;
-                        wrongList.appendChild(div);
-                    }
-                });
-            }
-            
-            // Send to Google form
             const formData = new URLSearchParams();
-            formData.append("entry.1861648410", studentName);
-            formData.append("entry.1691800437", scoreStr);
-            formData.append("entry.639295732", errorDetails.join("\n"));
-            formData.append("entry.370465671", "Unit 1 (Sections A-E)");
+            formData.append('entry.1861648410', studentName);
+            formData.append('entry.1691800437', scoreText);
+            formData.append('entry.639295732', errorDetailsStr);
+            formData.append('entry.370465671', testName);
             
-            fetch("https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse", {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: formData.toString()
-            }).catch(e => console.error(e));
+            fetch(formURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            }).then(() => {
+                document.getElementById('testScreen').classList.remove('active');
+                document.getElementById('resultScreen').classList.add('active');
+                document.getElementById('scoreDisplay').innerText = 'Điểm của bạn: ' + scoreText;
+                window.scrollTo(0, 0);
+            }).catch(err => {
+                alert('Có lỗi khi gửi kết quả. Vui lòng thử lại!');
+                console.error(err);
+            });
         }
         
-        function closeModal() {
-            document.getElementById('result-modal').style.display = 'none';
-            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
-        }
+        init();
     </script>
 </body>
 </html>
