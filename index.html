@@ -240,30 +240,32 @@
             }
         }
         
-        function checkQuestion(qid) {
+        function checkQuestion(qid, isSubmit = false) {
             if (state[qid].checked) return;
             const q = quizData.find(x => x.id.toString() === qid.toString());
             if (!q) return;
             
-            // Validate answered
-            if (q.type === 'multiple_choice' || q.type === 'mcq') {
-                let val = state[qid].value;
-                if (!val) { alert("Vui lòng chọn một đáp án!"); return; }
-            } else if (q.type === 'gap_fill_text') {
-                let allFilled = true;
-                if (q.blanks) {
-                    q.blanks.forEach(b => {
-                        const el = document.getElementById('input-' + qid + '-' + b.blankId);
-                        if (!el || !el.value.trim()) allFilled = false;
-                    });
-                }
-                if (!allFilled) { alert("Vui lòng điền vào tất cả chỗ trống!"); return; }
-            } else if (q.type === 'reordering') {
-                const bank = document.getElementById('bank-' + qid);
-                if (bank && bank.children.length > 0) { alert("Vui lòng ghép tất cả các từ!"); return; }
-            } else if (q.type === 'sentence_rewrite') {
-                const el = document.getElementById('input-' + qid);
-                if (!el || !el.value.trim()) { alert("Vui lòng nhập câu trả lời!"); return; }
+                        // Validate answered
+            if (!isSubmit) {
+                if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                    let val = state[qid].value;
+                    if (!val) { alert("Vui lòng chọn một đáp án!"); return; }
+                } else if (q.type === 'gap_fill_text') {
+                    let allFilled = true;
+                    if (q.blanks) {
+                        q.blanks.forEach(b => {
+                            const el = document.getElementById('input-' + qid + '-' + b.blankId);
+                            if (!el || !el.value.trim()) allFilled = false;
+                        });
+                    }
+                    if (!allFilled) { alert("Vui lòng điền vào tất cả chỗ trống!"); return; }
+                } else if (q.type === 'reordering') {
+                    const bank = document.getElementById('bank-' + qid);
+                    if (bank && bank.children.length > 0) { alert("Vui lòng ghép tất cả các từ!"); return; }
+                } else if (q.type === 'sentence_rewrite') {
+                    const el = document.getElementById('input-' + qid);
+                    if (!el || !el.value.trim()) { alert("Vui lòng nhập câu trả lời!"); return; }
+            }
             }
             
             // Check logic
@@ -449,10 +451,15 @@
             const total = quizData.length;
             const checkedCount = Object.values(state).filter(s => s.checked).length;
             if (checkedCount < total) {
-                if (!confirm(`Bạn mới kiểm tra ${checkedCount}/${total} câu. Bạn có chắc chắn muốn nộp bài?`)) {
+                if (!confirm(`Bạn mới kiểm tra ${checkedCount}/${total} câu. Hệ thống sẽ tự động chấm điểm cho các câu chưa làm (những câu để trống sẽ tính là Sai). Bạn có chắc chắn muốn nộp bài?`)) {
                     return;
                 }
             }
+            quizData.forEach(q => {
+                if (!state[q.id].checked) {
+                    checkQuestion(q.id, true);
+                }
+            });
             submitTest();
         }
         
