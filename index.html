@@ -47,7 +47,7 @@
     .check-btn { margin-top: 15px; background: #3498db; font-size: 14px; padding: 8px 16px; }
     .explanation { display: none; margin-top: 15px; padding: 15px; background: #eef2f5; border-radius: 6px; font-size: 14.5px; line-height: 1.5; color: #2c3e50; border-left: 4px solid #2ecc71; }
     
-    .result-details { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; text-align: left; max-height: 400px; overflow-y: auto; font-size: 14px; border: 1px solid #ddd; }
+    .result-details { margin-top: 20px; padding: 15px; padding-bottom: 30px; background: #f8f9fa; border-radius: 6px; text-align: left; max-height: 60vh; overflow-y: auto; font-size: 14px; border: 1px solid #ddd; }
     .error-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; color: #333; }
 </style>
 </head>
@@ -179,7 +179,6 @@
                     options.push(opt);
                 }
             });
-            options.sort(() => Math.random() - 0.5);
             options.forEach((opt, idx) => { opt.displayLabel = String.fromCharCode(65 + idx); });
             nq.options = options;
         } else if (nq.type === 'gap_fill_text') {
@@ -600,7 +599,7 @@
                 hasWrong = true;
                 wrongHTML += `<div class="error-item">
                     <strong>Câu ${index + 1}:</strong> ${q.questionHTML.replace(/\{\{blank:[^\}]+\}\}/g, '___')}<br>
-                    <span style="color:#e74c3c;">Học sinh: <span style="text-decoration:line-through;">${esc(hsStr)}</span></span><br>
+                    <span style="color:#e74c3c;">Học sinh: <span style="${hsStr.includes('chưa trả lời') ? '' : 'text-decoration:line-through;'}">${esc(hsStr)}</span></span><br>
                     <span style="color:#2ecc71; font-weight:bold;">Đáp án đúng: ${esc(rightStr)}</span>
                     <div style="margin-top:5px;font-size:13.5px;color:#333;">${q.explanationHTML ? (q.explanationHTML.includes('Giải thích:') ? q.explanationHTML : '<em>Giải thích:</em><br>' + q.explanationHTML) : ''}</div>
                 </div>`;
@@ -641,6 +640,7 @@
         }
         
         document.querySelectorAll('.check-btn').forEach(b => b.disabled = true);
+        document.querySelectorAll('input, .option, .word-chip').forEach(el => { el.disabled = true; el.style.pointerEvents = 'none'; el.style.opacity = '0.7'; });
 
     };
 
